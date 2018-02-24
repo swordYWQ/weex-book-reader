@@ -5,17 +5,25 @@
       <text class="header-title">{{activeViewTitle}}</text>
     </div> -->
     <router-view style="flex:1;"></router-view>
+    <!-- <component :is="activeBarName" style="flex:1"></component> -->
     <tab-bar :activeName="activeBarName" :list="viewList" @tabTo="onTabTo"></tab-bar>
   </div>
 </template>
 <script>
 import viewHeader from '../components/view-header.vue'
 import tabBar from '../components/tabBar.vue'
+
+// import BookShelf from './BookShelf.vue'
+// import FindingView from './FindingView.vue'
+// import MineView from './MineView.vue'
 export default {
   components: {
     // WxcTabBar,
     'tab-bar': tabBar,
-    'view-header': viewHeader
+    'view-header': viewHeader,
+    // 'bookshelf': BookShelf,
+    // 'findingview': FindingView,
+    // 'mineview': MineView
   },
   data() {
     return {
@@ -40,16 +48,16 @@ export default {
     }
   },
   computed: {
-    activeBarName(){
+    activeBarName() {
       return this.$store.state.activeBarName
     },
     activeViewTitle() {
       for (let i = 0; i < this.viewList.length; i++) {
         let item = this.viewList[i]
         console.log(item.name, this.activeBarName)
-          if (item.name === this.activeBarName) {
-            return item.content
-          }
+        if (item.name === this.activeBarName) {
+          return item.content
+        }
       }
     }
   },
@@ -58,29 +66,13 @@ export default {
       // let _key = _result.data.key || ''
       // this.$router && this.$router.push('/' + _key)
       // this.activeName = _key
-      this.$store.commit('SET_ACTIVE_BAR_NAME' , {name:_key})
-      
+      this.$store.commit('SET_ACTIVE_BAR_NAME', { name: _key })
+
       this.jump({ name: _key })
     }
   }
 }
 </script>
 <style scoped>
-/* .header {
-  position: relative;
-  height: 120px;
-  line-height: 120px;
-  margin-bottom: 3px;
-  border-bottom-width: 2px;
-  border-bottom-style: solid;
-  border-bottom-color: #dddddd;
-  background-color: skyblue;
-  padding: 25px;
-  justify-content: center;
-  align-items: center;
-}
-.header-title {
-  text-align: center;
-  font-size: 45px;
-} */
+
 </style>

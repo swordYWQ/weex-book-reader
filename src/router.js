@@ -10,6 +10,7 @@ import BookShelf from './views/BookShelf.vue'
 import FindingView from './views/FindingView.vue'
 import RankingView from './views/RankingView.vue'
 import MineView from './views/MineView.vue'
+import FictionView from './views/FictionView.vue'
 
 Vue.use(Router)
 
@@ -31,7 +32,8 @@ export default new Router({
       {path:'findingview',name:'findingview',component: FindingView},
       {path:'mineview',name:'mineview',component: MineView},
     ] },
-    {path:'rankingview',name:'rankingview',component: RankingView},
+    {path:'/rankingview',name:'rankingview',component: RankingView},
+    {path:'/fictionview',name:'fictionview',component: FictionView},
     
     { path: '/top', component: createStoriesView('top') },
     { path: '/new', component: createStoriesView('new') },

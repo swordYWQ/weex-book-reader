@@ -6,7 +6,7 @@ export default {
         this.$router.push(to)
       }
     },
-    translateGetParams(obj) {
+    translate(obj) {
       var rangeArr = [],
         param = '';
       if (obj && typeof obj === 'object') {
@@ -27,41 +27,29 @@ export default {
         return param
       }
     },
-    $fetch(url, callback) {
-      let config = this.$getConfig()
-      let apiHost = ''
-      if(config.env.platform === 'Web'){
-        apiHost = this.$store.state.apiHost
-        stream.fetch(
-          {
-            method: 'GET',
-            url:  '/api' + url,
-            type: 'json'
-          },
-          function (response) {
-            if (response.ok) {
-              callback(response.data)
-            } else {
-              console.error('接口访问失败!')
-            }
-          }
-        )
+    request(url, callback) {
+      let env = weex.config.env
+      let urlPath = ''
+      if (env.platform === 'Web') {
+        urlPath = '/api' + url
       } else {
-        stream.fetch(
-          {
-            method: 'GET',
-            url: apiHost + url,
-            type: 'json'
-          },
-          function (response) {
-            if (response.ok) {
-              callback(response.data)
-            } else {
-              console.error('接口访问失败!')
-            }
-          }
-        )
+        let apiHost = this.$store.state.apiHost
+        urlPath = apiHost + url
       }
+      stream.fetch(
+        {
+          method: 'GET',
+          url: urlPath,
+          type: 'json'
+        },
+        function (response) {
+          if (response.ok) {
+            callback(response.data)
+          } else {
+            console.error('接口访问失败!')
+          }
+        }
+      )
     }
   }
 }

@@ -25,10 +25,7 @@
   font-family: iconfont1;
 }
 .wrapper {
-  /* position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0; */
+  position: relative;
   height: 120px;
   flex-wrap: nowrap;
   flex-direction: row;

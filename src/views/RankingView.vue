@@ -11,7 +11,7 @@
          </div>
       </div>
         <div class="cell">
-          <div class="panel" v-for="(item,index) in rankList" :key="index" v-if="!item.collapse">
+          <div class="panel" v-for="(item,index) in rankList" :key="index" v-if="!item.collapse" @click="goBookList(item.monthRank)">
             <image class="category-icon" :src="imageHost+item.cover"></image>
             <text class="text">{{item.title}}</text>
           </div>
@@ -20,7 +20,7 @@
               <image class="category-icon" src="https://www.google.com/imgres?imgurl=https%3A%2F%2Fvanfruits.com%2Fstatic%2Fimages%2Fmore-products-1.jpg&imgrefurl=https%3A%2F%2Fwww.vanfruits.com%2F&docid=-mnIn4oNcmfLnM&tbnid=Z6ZTokiagoD_HM%3A&vet=10ahUKEwikgZnNh7vZAhXCXrwKHWQvClIQMwgnKAAwAA..i&w=800&h=800&bih=949&biw=1920&q=%E6%9B%B4%E5%A4%9A&ved=0ahUKEwikgZnNh7vZAhXCXrwKHWQvClIQMwgnKAAwAA&iact=mrc&uact=8"></image>
               <text class="text">别人家的排行榜</text>
             </div>
-            <div class="panel" v-for="(item,index) in rankList" :key="index" v-if="item.collapse" v-show="isShowMore">
+            <div class="panel" v-for="(item,index) in rankList" :key="index" v-if="item.collapse&&isShowMore">
               <image class="category-icon" :src="imageHost+item.cover"></image>
               <text class="text">{{item.title}}</text>
             </div>
@@ -33,9 +33,10 @@
 <script>
 // var stream = weex.requireModule('stream')
 import viewHeader from '../components/view-header.vue'
+
 export default {
   name: 'findings',
-  components:{
+  components: {
     'view-header': viewHeader
   },
   data() {
@@ -54,10 +55,10 @@ export default {
     imageHost() {
       return this.$store.state.imageHost
     },
-    rankList(){
-      if(this.nowSex===1){
+    rankList() {
+      if (this.nowSex === 1) {
         return this.male
-      } else if(this.nowSex===2){
+      } else if (this.nowSex === 2) {
         return this.female
       }
     }
@@ -66,7 +67,7 @@ export default {
     this.getRankType()
   },
   methods: {
-    changeSex(value){
+    changeSex(value) {
       this.nowSex = value
     },
     getCollaspeLen(list) {
@@ -80,12 +81,20 @@ export default {
       return count
     },
     getRankType() {
-      this.$fetch('/ranking/gender', data => {
+      this.request('/ranking/gender', data => {
         if (data.ok) {
           this.epub = data.epub || []
           this.male = data.male || []
           this.female = data.female || []
           this.picture = data.picture || []
+        }
+      })
+    },
+    goBookList(rankId){
+      this.jump({
+        name:'fictionview',
+        params:{
+          rankId : rankId
         }
       })
     }
@@ -102,26 +111,26 @@ export default {
   align-items: center;
 }
 .tab-sex-item {
-  flex:1;
+  flex: 1;
   /* border-right-width: 2px;
   border-right-color: #aaa;
   border-right-style: solid; */
-  padding-top:20px;
-  padding-bottom:20px;
+  padding-top: 20px;
+  padding-bottom: 20px;
 }
 /* .tab-sex-item:first-child {
   border-right-width: 2px;
   border-right-color: #aaa;
   border-right-style: solid;
 } */
-.select{
+.select {
   border-bottom-width: 2px;
-  border-bottom-color: #FF0000;
+  border-bottom-color: #ff0000;
   border-bottom-style: solid;
 }
-.tab-sex-item-text{
+.tab-sex-item-text {
   text-align: center;
-  font-size:30px;
+  font-size: 30px;
 }
 .cell {
 }
