@@ -47,18 +47,13 @@ export default {
       default: () => {
         return false
       }
-    },
-    backName: {
-      type: String,
-      default: () => {
-        return ''
-      }
     }
   },
   methods: {
     back() {
-      this.$store.commit('SET_ACTIVE_BAR_NAME', {name:this.backName})
-      this.jump({ name: this.backName })
+      if (this.isShowBack) {
+        this.$emit('back')
+      }
     }
   }
 }

@@ -1,5 +1,5 @@
 {
-  "name": "weex-hackernews",
+  "name": "weex-book-reader",
   "version": "1.0.0",
   "description": "Weex HackerNews App, powered by Vue.js.",
   "main": "index.js",
@@ -24,13 +24,14 @@
   "engines": {
     "node": ">=4.0"
   },
-  "author": "Hanks <zhanghan.me@gmail.com>",
+  "author": "weiqiang.yu",
   "license": "Apache-2.0",
   "dependencies": {
     "connect-timeout": "^1.9.0",
     "express": "^4.16.2",
     "http-proxy": "^1.16.2",
     "http-proxy-middleware": "^0.17.4",
+    "moment": "^2.20.1",
     "vue": "^2.1.10",
     "vue-router": "^2.1.1",
     "vuex": "^2.1.1",

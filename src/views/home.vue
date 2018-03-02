@@ -4,7 +4,7 @@
     <!-- <div class="header">
       <text class="header-title">{{activeViewTitle}}</text>
     </div> -->
-    <router-view style="flex:1;"></router-view>
+    <router-view ref="homeview" class="home-view"></router-view>
     <!-- <component :is="activeBarName" style="flex:1"></component> -->
     <tab-bar :activeName="activeBarName" :list="viewList" @tabTo="onTabTo"></tab-bar>
   </div>
@@ -20,7 +20,7 @@ export default {
   components: {
     // WxcTabBar,
     'tab-bar': tabBar,
-    'view-header': viewHeader,
+    'view-header': viewHeader
     // 'bookshelf': BookShelf,
     // 'findingview': FindingView,
     // 'mineview': MineView
@@ -36,12 +36,12 @@ export default {
         },
         {
           content: '发现',
-          name: 'findingview',
+          name: 'find',
           icon: '\ue61d'
         },
         {
           content: '我的',
-          name: 'mineview',
+          name: 'mine',
           icon: '\ue611'
         }
       ]
@@ -54,12 +54,14 @@ export default {
     activeViewTitle() {
       for (let i = 0; i < this.viewList.length; i++) {
         let item = this.viewList[i]
-        console.log(item.name, this.activeBarName)
         if (item.name === this.activeBarName) {
           return item.content
         }
       }
     }
+  },
+  created(){
+    this.initLocalData()
   },
   methods: {
     onTabTo(_key) {
@@ -69,10 +71,17 @@ export default {
       this.$store.commit('SET_ACTIVE_BAR_NAME', { name: _key })
 
       this.jump({ name: _key })
+    },
+    initLocalData(){
+      this.$store.dispatch('GET_BOOKLIST') // 初始化从本地获取书架列表
+      this.$store.dispatch('GET_CHAPTERINFO') // 初始化本地缓存的章节列表
+      this.$store.dispatch('GET_SETTINGCONFIG') // 初始化本地配置
     }
   }
 }
 </script>
 <style scoped>
-
+.home-view {
+  flex: 1;
+}
 </style>

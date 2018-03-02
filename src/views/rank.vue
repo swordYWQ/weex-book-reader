@@ -1,6 +1,6 @@
 <template>
     <div>
-      <view-header title="排行榜" :isShowBack="true" backName="findingview"></view-header>
+      <view-header title="排行榜" :isShowBack="true" @back="goback"></view-header>
       <scroller class="scroller">
       <div class="tab-sex">
         <div class="tab-sex-item" :class="[nowSex===1?'select':'']" @click="changeSex(1)">
@@ -11,13 +11,13 @@
          </div>
       </div>
         <div class="cell">
-          <div class="panel" v-for="(item,index) in rankList" :key="index" v-if="!item.collapse" @click="goBookList(item.monthRank)">
+          <div class="panel" v-for="(item,index) in rankList" :key="index" v-if="!item.collapse" @click="goBookList(item)">
             <image class="category-icon" :src="imageHost+item.cover"></image>
             <text class="text">{{item.title}}</text>
           </div>
           <template v-if="getCollaspeLen(rankList)">
             <div class="panel" @click="isShowMore=!isShowMore">
-              <image class="category-icon" src="https://www.google.com/imgres?imgurl=https%3A%2F%2Fvanfruits.com%2Fstatic%2Fimages%2Fmore-products-1.jpg&imgrefurl=https%3A%2F%2Fwww.vanfruits.com%2F&docid=-mnIn4oNcmfLnM&tbnid=Z6ZTokiagoD_HM%3A&vet=10ahUKEwikgZnNh7vZAhXCXrwKHWQvClIQMwgnKAAwAA..i&w=800&h=800&bih=949&biw=1920&q=%E6%9B%B4%E5%A4%9A&ved=0ahUKEwikgZnNh7vZAhXCXrwKHWQvClIQMwgnKAAwAA&iact=mrc&uact=8"></image>
+              <!-- <image class="category-icon" src="https://www.google.com/imgres?imgurl=https%3A%2F%2Fvanfruits.com%2Fstatic%2Fimages%2Fmore-products-1.jpg&imgrefurl=https%3A%2F%2Fwww.vanfruits.com%2F&docid=-mnIn4oNcmfLnM&tbnid=Z6ZTokiagoD_HM%3A&vet=10ahUKEwikgZnNh7vZAhXCXrwKHWQvClIQMwgnKAAwAA..i&w=800&h=800&bih=949&biw=1920&q=%E6%9B%B4%E5%A4%9A&ved=0ahUKEwikgZnNh7vZAhXCXrwKHWQvClIQMwgnKAAwAA&iact=mrc&uact=8"></image> -->
               <text class="text">别人家的排行榜</text>
             </div>
             <div class="panel" v-for="(item,index) in rankList" :key="index" v-if="item.collapse&&isShowMore">
@@ -35,7 +35,7 @@
 import viewHeader from '../components/view-header.vue'
 
 export default {
-  name: 'findings',
+  name: 'rank',
   components: {
     'view-header': viewHeader
   },
@@ -67,6 +67,11 @@ export default {
     this.getRankType()
   },
   methods: {
+    goback(){
+      this.$store.commit('SET_ACTIVE_BAR_NAME', { name: 'find' })
+      // this.jump({ name: 'findingview' })
+      this.$router.back()
+    },
     changeSex(value) {
       this.nowSex = value
     },
@@ -81,7 +86,7 @@ export default {
       return count
     },
     getRankType() {
-      this.request('/ranking/gender', data => {
+      this.request('/ranking/gender',1, data => {
         if (data.ok) {
           this.epub = data.epub || []
           this.male = data.male || []
@@ -90,11 +95,13 @@ export default {
         }
       })
     },
-    goBookList(rankId){
+    goBookList(item) {
       this.jump({
-        name:'fictionview',
-        params:{
-          rankId : rankId
+        name: 'booklist',
+        query: {
+          week: item._id,
+          month: item.monthRank,
+          total: item.totalRank
         }
       })
     }

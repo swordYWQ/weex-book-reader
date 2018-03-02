@@ -1,27 +1,57 @@
 <template>
   <!-- <div> -->
-    <scroller class="scroller">
-      <div class="box-list">
-        <div class="box-list-item" v-for="n in 10" :key="n">
-          <image class="item-image" src="http://pic.qiantucdn.com/58pic/16/81/64/46S58PIC7Qk.jpg!/fw/300/clip/0x400a0a0/format/webp"></image>
-          <text class="item-text" :line="2">书名</text>
+    <scroller class="scroller" v-if="BookList.length>0">
+      <!--默认九宫格布局-->
+      <!-- <div class="box-list">
+        <div class="box-list-item" v-for="(item,index) in BookList" :key="index" @click="readBook(item)">
+          <image class="item-image" :src="imageHost+item.cover"></image>
+          <text class="item-text" :line="2">{{item.title}}</text>
         </div>
-      </div>
+      </div> -->
+      <!--按行显示-->
+      <list class="row-box-list">
+        <cell v-for="(item,index) in BookList" :key="index" class="row-box-list-item" @click="readBook(item)">
+          <div class="row-book-img-panel">
+            <image class="row-book-img" :src="imageHost+item.cover"></image>
+          </div>
+          <div class="row-book-desc">
+            <text class="row-book-title">{{item.title}}</text>
+            <text class="row-book-author">{{item.author}}</text>
+            <text class="row-book-chapter">{{item.lastChapter}}</text>
+          </div>
+        </cell>
+      </list>
     </scroller>
+    <div class="no-data-view" v-else>
+        <text class="no-data-text">暂未添加书籍，快去书城中添加吧!</text>
+      </div>
     <!-- </div> -->
 </template>
 <script>
 export default {
-  name: 'book-list'
+  name: 'book-list',
+  computed: {
+    imageHost() {
+      return this.$store.state.imageHost
+    },
+    BookList() {
+      return this.$store.state.BookList
+    }
+  },
+  methods: {
+    readBook(item) {
+      let bookId = item._id
+      let bookTitle = item.title
+      this.jump({ name: 'read', query: { bookId: bookId , bookTitle: bookTitle  } })
+    }
+  }
 }
 </script>
 <style scoped>
-.scroller{
-  /* height:calc(100% - 240px); */
+.scroller {
 }
 .box-list {
-  /* height: calc(100% - 120px); header高度为120 */
-  justify-content: space-between;
+  justify-content: flex-start;
   flex-direction: row;
   flex-wrap: wrap;
 }
@@ -30,10 +60,6 @@ export default {
   padding-right: 20px;
   padding-bottom: 20px;
   padding-left: 20px;
-  /* margin-top: 10px;
-  margin-right: 10px;
-  margin-bottom: 10px;
-  margin-left: 10px; */
   width: 250px;
   height: 330px;
   justify-content: center;
@@ -46,6 +72,61 @@ export default {
 }
 .item-text {
   text-align: center;
-  font-size:40px;
+  font-size: 30px;
+}
+.no-data-view {
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+}
+.no-data-text {
+  text-align: center;
+  font-size: 30px;
+}
+
+.row-box-list {
+  flex: 1;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+.row-box-list-item {
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  /* height:230px; */
+  padding-top: 10px;
+  padding-left: 20px;
+  padding-bottom: 10px;
+  padding-right: 20px;
+  border-bottom-width: 2px;
+  border-bottom-style: solid;
+  border-bottom-color: #eee;
+}
+.row-book-img-panel {
+  width: 120px;
+  margin-bottom: 20px;
+  margin-top: 20px;
+}
+.row-book-img {
+  width: 120px;
+  height: 140px;
+}
+.row-book-desc {
+  width: 630px;
+  height: 140px;
+  padding-left: 30px;
+  justify-content: flex-start;
+}
+.row-book-title {
+  font-weight: 700;
+  font-size: 30px;
+}
+.row-book-author {
+  font-size: 30px;
+  color: #aaa;
+}
+.row-book-chapter {
+  font-size: 30px;
+  color: #aaa;
 }
 </style>

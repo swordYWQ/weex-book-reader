@@ -3,9 +3,24 @@
     <!-- <view-header title="我的"></view-header> -->
     <scroller class="scroller">
       <!-- <list class="list"> -->
-        <div class="cell" v-for="n in 20" :key="n">
+        <!-- <div class="cell">
           <div class="panel">
-            <text class="text">我的{{n}}</text>
+            <text class="text">主题风格</text>
+          </div>
+        </div> -->
+        <!-- <div class="cell">
+          <div class="panel">
+            <text class="text">设置</text>
+          </div>
+        </div> -->
+        <div class="cell">
+          <div class="panel" @click="clearStorage">
+            <text class="text">清理缓存</text>
+          </div>
+        </div>
+        <div class="cell">
+          <div class="panel" @click="jump({name:'about'})">
+            <text class="text">关于</text>
           </div>
         </div>
       <!-- </list> -->
@@ -16,9 +31,11 @@
 // import viewHeader from '../components/view-header.vue'
 export default {
   name: 'category',
-  // components: {
-  //   'view-header': viewHeader
-  // }
+  methods:{
+    clearStorage(){
+      this.$store.dispatch('clearStorage')
+    }
+  }
 }
 </script>
 <style scoped>

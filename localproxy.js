@@ -40,11 +40,20 @@ app.use('/', express.static(__dirname));
 
 // 反向代理（这里把需要进行反代的路径配置到这里即可）
 // eg:将/api/test 代理到 ${HOST}/api/test
-app.use('/api', proxy({
+app.use('/api1', proxy({
   target: 'http://api.zhuishushenqi.com', pathRewrite: {
-    '^/api': '/'
+    '^/api1': '/'
   },
+  changeOrigin: true
 }));
+
+app.use('/api2', proxy({
+  target: 'http://chapterup.zhuishushenqi.com', pathRewrite: {
+    '^/api2': '/'
+  },
+  changeOrigin: true
+}))
+
 // app.get('/', function (req, res) {
 //   return res.sendFile(path.join(__dirname, 'index.html'));
 // });

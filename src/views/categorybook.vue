@@ -1,8 +1,8 @@
 <template>
     <div v-if="bookInfo">
-      <view-header :title="bookInfo.title" :isShowBack="true" @back="goback"></view-header>
+      <view-header :title="pageTitle||''" :isShowBack="true" @back="goback"></view-header>
       <scroller class="scroller">
-      <div class="tab-sex">
+      <!-- <div class="tab-sex">
         <div class="tab-sex-item" :class="[rankTimeType===1?'select':'']" @click="changeRankType(1)">
         <text class="tab-sex-item-text">周榜</text>
         </div>
@@ -12,7 +12,7 @@
          <div class="tab-sex-item" :class="[rankTimeType===3?'select':'']" @click="changeRankType(3)">
         <text class="tab-sex-item-text" >总榜</text>
          </div>
-      </div>
+      </div> -->
       <list>
         <cell v-for="(item,index) in bookList" :key="index" class="book-panel" @click="lookBookInfo(item)">
           <div class="book-img-panel">
@@ -60,19 +60,22 @@ export default {
     imageHost() {
       return this.$store.state.imageHost
     },
-    rankId() {
-      let route = this.$route
-      if (this.rankTimeType === 1) {
-        //周榜
-        return route.query.week
-      } else if (this.rankTimeType === 2) {
-        //月榜
-        return route.query.month
-      } else if (this.rankTimeType === 3) {
-        //总榜
-        return route.query.total
-      }
-      return ''
+    // rankId() {
+    //   let route = this.$route
+    //   if (this.rankTimeType === 1) {
+    //     //周榜
+    //     return route.query.week
+    //   } else if (this.rankTimeType === 2) {
+    //     //月榜
+    //     return route.query.month
+    //   } else if (this.rankTimeType === 3) {
+    //     //总榜
+    //     return route.query.total
+    //   }
+    //   return ''
+    // },
+    pageTitle(){
+      return this.$route.query.major
     },
     totalBooks() {
       if (this.bookInfo) {
@@ -88,22 +91,35 @@ export default {
     goback(){
       this.$router.back()
     },
-    changeRankType(value) {
-      this.rankTimeType = value
-      this.bookList = []
-      this.getBookList()
-    },
+    // changeRankType(value) {
+    //   this.rankTimeType = value
+    //   this.bookList = []
+    //   this.getBookList()
+    // },
     getBookList() {
-      console.log(this.rankId)
-      if (this.rankId) {
-        // this.len = 10
-        this.request('/ranking/' + this.rankId,1, data => {
+      // console.log(this.rankId)
+      // if (this.rankId) {
+        let query = this.$route.query
+        let gender = query.gender
+        let type = query.type
+        let major = query.major
+        let minor = query.minor
+        let start  = 0
+        let limit = 20
+        this.request('/book/by-categories' + this.translate({
+          gender:gender,
+          type:type,
+          major:major,
+          minor:minor,
+          start:start,
+          limit:limit
+        }),1, data => {
           if (data.ok) {
-            this.bookInfo = data.ranking
+            this.bookInfo = data
             this.refreshBookList()
           }
         })
-      }
+      // }
     },
     loadMoreBook() {
       // this.len += 10

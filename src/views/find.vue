@@ -1,17 +1,17 @@
 <template>
     <scroller class="scroller">
-        <div class="cell" >
-          <div class="search-group">
+        <list class="cell" >
+          <cell class="search-group">
             <input type="text" placeholder="请输入小说名" class="search-input" value=""/>
             <a class="search-btn">
             <text class="search-btn-text" @click="search">搜索</text>
             </a>
-          </div>
-          <div class="panel" v-for="(item,index) in findingList" :key="index" @click="lookDetail(item.name)">
+          </cell>
+          <cell class="panel" v-for="(item,index) in findingList" :key="index" @click="lookDetail(item.name)">
             <!-- <image class="category-icon" :src=""></image> -->
             <text class="text">{{item.content}}</text>
-          </div>
-        </div>
+          </cell>
+        </list>
     </scroller>
 </template>
 <script>
@@ -23,11 +23,11 @@ export default {
       findingList: [
         {
           content: '排行榜',
-          name: 'rankingview'
+          name: 'rank'
         },
         {
           content: '分类',
-          name: 'Category'
+          name: 'category'
         }
       ]
     }
@@ -69,6 +69,7 @@ export default {
 .cell {
 }
 .search-group{
+  /* flex:1; */
   height: 100px;
   flex-direction: row;
   justify-content: flex-start;
