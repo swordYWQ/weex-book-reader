@@ -2,7 +2,7 @@ export default {
   bookShelfLayout: 1, // 1 九宫格显示 2 按行显示
   commonTheme: 'default', // 全局主题
   commonThemeList: ['default', 'red', 'pink', 'black'], //全局主题列表
-  readFontSize: 56, // 阅读字体
+  readFontSize: 40, // 阅读字体
   readTheme: 'default', // 阅读主题
   readThemeList: [ 
   {name:'default',title:'默认',bgcolor:'#fff',color:'#333'}, 

@@ -19,6 +19,11 @@
           </div>
         </div>
         <div class="cell">
+          <div class="panel" @click="set">
+            <text class="text">设置</text>
+          </div>
+        </div>
+        <div class="cell">
           <div class="panel" @click="jump({name:'about'})">
             <text class="text">关于</text>
           </div>
@@ -28,10 +33,16 @@
     <!-- </div> -->
 </template>
 <script>
-// import viewHeader from '../components/view-header.vue'
+var modal = weex.requireModule('modal')
 export default {
   name: 'category',
   methods:{
+    set(){
+      modal.toast({
+            message: '暂未开发',
+            duration: 1
+      })
+    },
     clearStorage(){
       this.$store.dispatch('clearStorage')
     }

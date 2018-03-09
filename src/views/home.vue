@@ -75,7 +75,9 @@ export default {
     initLocalData(){
       this.$store.dispatch('GET_BOOKLIST') // 初始化从本地获取书架列表
       this.$store.dispatch('GET_CHAPTERINFO') // 初始化本地缓存的章节列表
+      this.$store.dispatch('GET_MARKINFO') // 初始化书签信息
       this.$store.dispatch('GET_SETTINGCONFIG') // 初始化本地配置
+      this.$store.dispatch('getApiCache') // 初始化缓存的api结果
     }
   }
 }

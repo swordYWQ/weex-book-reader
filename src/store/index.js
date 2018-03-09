@@ -37,8 +37,10 @@ const store = new Vuex.Store({
     activeBarName: 'bookshelf', // 当前选中的tabbar 默认为书架
     BookList: [], // 本地书架
     ChapterInfo: [], //获取的章节目录
-    markInfo:[],
-    settingConfig: null
+    markInfo:{},
+    ApiCache:{},
+    settingConfig: null,
+    loadingState: false, //loading状态
   },
 
   getters: {

@@ -1,5 +1,5 @@
 <template>
-    <div v-if="bookInfo">
+    <div v-if="bookList.length">
       <view-header :title="pageTitle||''" :isShowBack="true" @back="goback"></view-header>
       <scroller class="scroller">
       <!-- <div class="tab-sex">
@@ -50,7 +50,7 @@ export default {
       // isShowMore: false,
 
       rankTimeType: 1,
-      bookInfo: null,
+      // bookInfo: null,
 
       len: 0, // 默认显示的书籍列表数量
       bookList: []
@@ -74,21 +74,21 @@ export default {
     //   }
     //   return ''
     // },
-    pageTitle(){
+    pageTitle() {
       return this.$route.query.major
-    },
-    totalBooks() {
-      if (this.bookInfo) {
-        return this.bookInfo.books
-      }
-      return []
     }
+    // totalBooks() {
+    //   if (this.bookInfo) {
+    //     return this.bookInfo.books
+    //   }
+    //   return []
+    // }
   },
   created() {
-    this.getBookList()
+    this.getBookList(0)
   },
   methods: {
-    goback(){
+    goback() {
       this.$router.back()
     },
     // changeRankType(value) {
@@ -96,45 +96,54 @@ export default {
     //   this.bookList = []
     //   this.getBookList()
     // },
-    getBookList() {
+    getBookList(index) {
       // console.log(this.rankId)
       // if (this.rankId) {
-        let query = this.$route.query
-        let gender = query.gender
-        let type = query.type
-        let major = query.major
-        let minor = query.minor
-        let start  = 0
-        let limit = 20
-        this.request('/book/by-categories' + this.translate({
-          gender:gender,
-          type:type,
-          major:major,
-          minor:minor,
-          start:start,
-          limit:limit
-        }),1, data => {
+      let query = this.$route.query
+      let gender = query.gender
+      let type = query.type
+      let major = query.major
+      let minor = query.minor
+      let start = index
+      let limit = 10
+      this.request(
+        '/book/by-categories' +
+          this.translate({
+            gender: gender,
+            type: type,
+            major: major,
+            minor: minor,
+            start: start,
+            limit: limit
+          }),
+        1,
+        data => {
           if (data.ok) {
-            this.bookInfo = data
-            this.refreshBookList()
+            // this.bookInfo = data
+            data.books.forEach(item => {
+              this.bookList.push(item)
+            })
+            // this.refreshBookList()
           }
-        })
+        }
+      )
       // }
     },
     loadMoreBook() {
       // this.len += 10
-      this.refreshBookList()
+      this.getBookList(this.bookList.length - 1)
+      // this.refreshBookList()
     },
-    refreshBookList() {
-      this.totalBooks.forEach((item, index) => {
-        if (index >= this.len && index < this.len + 10) {
-          this.bookList.push(item)
-        }
-      })
-      this.len = this.bookList.length
-    },
-    lookBookInfo(item){
-      this.jump({name:'bookinfo',query:{bookId:item._id}})
+    // refreshBookList() {
+    //   this.totalBooks.forEach((item, index) => {
+    //     if (index >= this.len && index < this.len + 10) {
+    //       this.bookList.push(item)
+    //     }
+    //   })
+    //   this.len = this.bookList.length
+    // },
+    lookBookInfo(item) {
+      this.jump({ name: 'bookinfo', query: { bookId: item._id } })
     }
   }
 }

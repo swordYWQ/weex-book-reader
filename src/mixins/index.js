@@ -32,7 +32,7 @@ export default {
       }
     },
     // fetch请求封装 type 0 自带host的接口 1 api接口 2 章节内容接口
-    request(url, type, callback) {
+    request(url, type, callback, refresh = false) {
       let env = weex.config.env
       let urlPath = ''
       if (env.platform === 'Web') {
@@ -54,21 +54,38 @@ export default {
           urlPath = chapterHost + url
         }
       }
-      stream.fetch(
-        {
-          method: 'GET',
-          url: urlPath,
-          type: 'json',
-          timeout: 5000
-        },
-        function (response) {
-          if (response.ok) {
-            callback(response.data)
-          } else {
-            console.error('接口访问失败!')
+      let ApiCache = this.$store.state.ApiCache
+      let self = this
+      let fetchFunc = () => {
+        this.$store.commit('showloading')
+        stream.fetch(
+          {
+            method: 'GET',
+            url: urlPath,
+            type: 'json',
+            timeout: 5000
+          },
+           (response)=> {
+            if (response.ok) {
+              this.$store.commit('closeloading')
+              self.$store.dispatch('setApiCache', { api: urlPath, result: response.data })
+              callback(response.data)
+            } else {
+              this.$store.commit('closeloading')
+              console.error('接口访问失败!')
+            }
           }
+        )
+      }
+      if (!refresh) {
+        if (ApiCache[urlPath]) {
+          callback(ApiCache[urlPath])
+        } else {
+          fetchFunc()
         }
-      )
+      } else {
+        fetchFunc()
+      }
     },
     // 日期处理函数
     moment: moment

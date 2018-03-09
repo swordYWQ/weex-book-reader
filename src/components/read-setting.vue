@@ -1,10 +1,10 @@
 <template>
   <div class="read-setting">
+    <div class="seting-none" @click="HideSetting"></div>
     <div class="setting-top">
       <text class="exit-icon" @click="exit">&#xe641;</text>
       <text class="book-title">{{bookTitle}}</text>
     </div>
-    <div class="seting-none" @click="HideSetting"></div>
 
     <div class="setting-body">
     <div class="setting-view" v-if="isShowSetting">
@@ -104,7 +104,7 @@ export default {
   left: 0;
   width: 750px;
   height: 1334px;
-  z-index: 1;
+  /* z-index: 1; */
 }
 .setting-top {
   position: absolute;
@@ -116,12 +116,12 @@ export default {
   justify-content: flex-start;
   align-items: center;
   background-color: #555;
-  z-index: 1;
+  /* z-index: 2; */
 }
 .seting-none {
   width: 750px;
   height: 1334px;
-  /* z-index: 0; */
+  /* z-index: 1; */
 }
 .exit-icon {
   font-family: iconfont1;
@@ -141,7 +141,7 @@ export default {
   position: absolute;
   bottom: 0;
   left: 0;
-  z-index: 1;
+  z-index: 2;
   background-color: #555;
 }
 

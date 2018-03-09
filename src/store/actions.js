@@ -133,35 +133,87 @@ export function SET_SETTINGCONFIG({ state, dispatch }, config) {
     }
   })
 }
-
+// 获取缓存书签
 export function GET_MARKINFO({ commit }) {
   storage.getItem('MARKINFO', (e) => {
     if (e.data === 'undefined') {
-      storage.setItem('MARKINFO', '[]')
+      storage.setItem('MARKINFO', '{}')
     }
     let markinfo = e.data && e.data !== 'undefined' ? JSON.parse(e.data) : []
-    commit('SET_MARKINFO', { markinfo } || [])
+    commit('SET_MARKINFO', { markinfo } || {})
   })
 }
-export function SET_MARKINFO({ state, dispatch }, markinfo) {
+// 设置书签
+export function SET_MARKINFO({ state, dispatch }, { bookId, markinfo }) {
   let list = state.markInfo
-  list.push(markinfo)
-  storage.setItem('MARKINFO', JSON.stringify(markinfo), (e) => {
+  list[bookId] = markinfo
+  // list.push(markinfo)
+  storage.setItem('MARKINFO', JSON.stringify(list), (e) => {
     if (e.result === 'success') {
       dispatch('GET_MARKINFO')
     }
   })
 }
 
-export function clearStorage({ dispatch }) {
-  storage.setItem('CHAPTERINFO', '[]', (e) => {
+// 获取api缓存数据
+export function getApiCache({ commit }) {
+  storage.getItem('APICACHE', (e) => {
+    if (e.data === 'undefined') {
+      storage.setItem('APICACHE', '{}')
+    }
+    let apicache = e.data && e.data !== 'undefined' ? JSON.parse(e.data) : []
+    commit('SET_APICACHE', { apicache } || [])
+  })
+}
+// 设置api缓存
+export function setApiCache({ dispatch, state }, { api, result }) {
+  let list = state.ApiCache
+  list[api] = result
+  storage.setItem('APICACHE', JSON.stringify(list), (e) => {
     if (e.result === 'success') {
-      dispatch('GET_CHAPTERINFO')
+      dispatch('getApiCache')
+    }
+  })
+}
+
+// 清理本地缓存
+export function clearStorage({ dispatch }) {
+  // // 清理章节缓存
+  // storage.setItem('CHAPTERINFO', '[]', (e) => {
+  //   if (e.result === 'success') {
+  //     dispatch('GET_CHAPTERINFO')
+  //     modal.toast({
+  //       message: '清理缓存成功!',
+  //       duration: 1
+  //     })
+  //   }
+  // })
+  storage.setItem('SETTINGCONFIG',  JSON.stringify(defaultSetting), (e) => {
+    if (e.result === 'success') {
+      dispatch('GET_SETTINGCONFIG')
       modal.toast({
-        message: '清理缓存成功!',
+        message: '清理设置缓存成功!',
+        duration: 1
+      })
+    }
+  })
+  storage.setItem('MARKINFO', '{}', (e) => {
+    if (e.result === 'success') {
+      dispatch('GET_MARKINFO')
+      modal.toast({
+        message: '清理书签缓存成功!',
+        duration: 1
+      })
+    }
+  })
+  // 清理api缓存
+  storage.setItem('APICACHE', '{}', (e) => {
+    if (e.result === 'success') {
+      dispatch('getApiCache')
+      modal.toast({
+        message: '清理API缓存成功!',
         duration: 1
       })
     }
   })
 }
-

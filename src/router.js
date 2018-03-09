@@ -46,6 +46,7 @@ export default new VueRouter({
     { path: '/bookinfo', name: 'bookinfo', component: BookInfo },
     { path: '/read', name: 'read', component: ReadingView },
     { path: '/about', name: 'about', component: About },
+
     // { path: '/top', component: createStoriesView('top') },
     // { path: '/new', component: createStoriesView('new') },
     // { path: '/show', component: createStoriesView('show') },

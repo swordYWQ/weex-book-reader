@@ -38,3 +38,14 @@ export function SET_SETTINGCONFIG(state, { config }) {
 export function SET_MARKINFO(state, { markinfo }) {
   state.markInfo = markinfo
 }
+
+export function SET_APICACHE(state, { apicache }) {
+  state.ApiCache = apicache
+}
+
+export function showloading(state){
+  state.loadingState = true
+}
+export function closeloading(state){
+  state.loadingState = false
+}
