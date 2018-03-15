@@ -1,11 +1,10 @@
 <template>
     <scroller class="scroller">
         <list class="cell" >
-          <cell class="search-group">
-            <input type="text" placeholder="请输入小说名" class="search-input" value=""/>
-            <a class="search-btn">
-            <text class="search-btn-text" @click="search">搜索</text>
-            </a>
+          <cell class="search-group" @click="search">
+            <div class="search-input">
+              <text class="text search-text">请输入小说名</text>
+            </div>
           </cell>
           <cell class="panel" v-for="(item,index) in findingList" :key="index" @click="lookDetail(item.name)">
             <!-- <image class="category-icon" :src=""></image> -->
@@ -38,15 +37,15 @@ export default {
     }
   },
   // created() {
-    // this.getRankType()
+  // this.getRankType()
   // },
   methods: {
-    search(){
-      console.log('search')
+    search() {
+      this.jump({ name: 'search' })
     },
-    lookDetail(name){
+    lookDetail(name) {
       // console.log(name)
-      this.jump({name:name})
+      this.jump({ name: name })
     }
     // getRankType() {
     //   this.$fetch('/ranking/gender', data => {
@@ -68,30 +67,31 @@ export default {
 }
 .cell {
 }
-.search-group{
+.search-group {
   /* flex:1; */
-  height: 100px;
+  /* height: 100px; */
   flex-direction: row;
   justify-content: flex-start;
   align-items: center;
 }
-.search-input{
-  flex:1;
-  padding-left: 40px;
-
+.search-input {
+  margin-left: 20px;
+  margin-right: 20px;
+  flex: 1;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  /* padding-left: 40px; */
+  text-align: center;
+  border-style: solid;
+  border-width: 2px;
+  border-color: #ddd;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
 }
-.search-btn{
-  width: 100px;
-    padding-top: 10px;
-    padding-bottom: 10px;
-    margin-right: 20px;
-    border-width: 2px;
-    border-style: solid;
-    border-color: #DDDDDD;
-    background-color: #F5F5F5;
-}
-.search-btn-text{
-  font-size:30px;
+.search-btn-text {
+  font-size: 30px;
   text-align: center;
 }
 .panel {
@@ -108,9 +108,15 @@ export default {
   width: 45px;
   height: 45px;
 }
-.text {
+.text{
   margin-left: 20px;
   font-size: 45px;
+  text-align: center;
+}
+.search-text {
+  margin-left: 20px;
+  font-size: 30px;
+  text-align: center;
   color: #666666;
 }
 </style>

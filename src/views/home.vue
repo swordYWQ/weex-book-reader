@@ -1,12 +1,15 @@
 <template>
   <div>
     <view-header :title="activeViewTitle" @tabTo="onTabTo"></view-header>
+    <tab-bar :activeName="activeBarName" :list="viewList" @tabTo="onTabTo"></tab-bar>
     <!-- <div class="header">
       <text class="header-title">{{activeViewTitle}}</text>
     </div> -->
-    <router-view ref="homeview" class="home-view"></router-view>
+    <!-- <keep-alive> -->
+      <router-view ref="homeview" class="home-view" :style="{height:deviceHeight+'px'}"></router-view>
+    <!-- </keep-alive> -->
     <!-- <component :is="activeBarName" style="flex:1"></component> -->
-    <tab-bar :activeName="activeBarName" :list="viewList" @tabTo="onTabTo"></tab-bar>
+    
   </div>
 </template>
 <script>
@@ -28,6 +31,7 @@ export default {
   data() {
     return {
       // activeName: 'bookshelf',
+      deviceHeight: 0,
       viewList: [
         {
           content: '书架',
@@ -60,7 +64,9 @@ export default {
       }
     }
   },
-  created(){
+  created() {
+    let env = weex.config.env
+    this.deviceHeight = (env.deviceHeight - 240) * env.scale
     this.initLocalData()
   },
   methods: {
@@ -72,8 +78,8 @@ export default {
 
       this.jump({ name: _key })
     },
-    initLocalData(){
-      this.$store.dispatch('GET_BOOKLIST') // 初始化从本地获取书架列表
+    initLocalData() {
+      // this.$store.dispatch('GET_BOOKLIST') // 初始化从本地获取书架列表
       this.$store.dispatch('GET_CHAPTERINFO') // 初始化本地缓存的章节列表
       this.$store.dispatch('GET_MARKINFO') // 初始化书签信息
       this.$store.dispatch('GET_SETTINGCONFIG') // 初始化本地配置
@@ -84,6 +90,9 @@ export default {
 </script>
 <style scoped>
 .home-view {
-  flex: 1;
+  /* flex: 1; */
+  width:750px;
+  margin-top:120px;
+  margin-bottom:120px;
 }
 </style>

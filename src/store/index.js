@@ -36,7 +36,7 @@ const store = new Vuex.Store({
     imageHost: 'http://statics.zhuishushenqi.com',
     activeBarName: 'bookshelf', // 当前选中的tabbar 默认为书架
     BookList: [], // 本地书架
-    ChapterInfo: [], //获取的章节目录
+    ChapterInfo: {},//[], //获取的章节目录
     markInfo:{},
     ApiCache:{},
     settingConfig: null,

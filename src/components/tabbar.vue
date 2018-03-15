@@ -25,7 +25,10 @@
   font-family: iconfont1;
 }
 .wrapper {
-  position: relative;
+  position: fixed;
+  bottom:0;
+  left:0;
+  width:750px;
   height: 120px;
   flex-wrap: nowrap;
   flex-direction: row;
@@ -47,7 +50,7 @@
   text-align: center;
 }
 .bar-active {
-  color: #b4282d;
+  color: skyblue;
 }
 .bar-ic {
   padding-top: 14px;

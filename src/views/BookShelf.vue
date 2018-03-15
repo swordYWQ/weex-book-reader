@@ -10,7 +10,7 @@
       </div> -->
       <!--按行显示-->
       <list class="row-box-list">
-        <cell v-for="(item,index) in BookList" :key="index" class="row-box-list-item" @click="readBook(item)">
+        <cell v-for="(item,index) in BookList" :key="index" class="row-box-list-item" @click="readBook(item)" @longpress="showSelector(item)">
           <div class="row-book-img-panel">
             <image class="row-book-img" :src="imageHost+item.cover"></image>
           </div>
@@ -21,6 +21,8 @@
           </div>
         </cell>
       </list>
+
+      <book-selector v-if="isShowSelector" :bookInfo="selectBook" @delete="removeFromBookList" @close="closeSelector"></book-selector>
     </scroller>
     <div class="no-data-view" v-else>
         <text class="no-data-text">暂未添加书籍，快去书城中添加吧!</text>
@@ -28,17 +30,52 @@
     <!-- </div> -->
 </template>
 <script>
+import BookSelector from '../components/book-selector.vue'
 export default {
   name: 'book-list',
+  components:{
+    'book-selector': BookSelector
+  },
+  data(){
+    return {
+      isShowSelector: false,
+      selectBook: '',
+    }
+  },
   computed: {
     imageHost() {
       return this.$store.state.imageHost
     },
     BookList() {
-      return this.$store.state.BookList
+      let bookList = this.$store.state.BookList
+      return bookList
     }
   },
+  created(){
+    this.$store.dispatch('GET_BOOKLIST') // 初始化从本地获取书架列表
+  },
   methods: {
+    onrefresh (event) {
+      this.refreshing = true
+
+    },
+    showSelector(item){
+      // 显示书籍选项卡
+      this.selectBook = item
+      this.isShowSelector = true
+    },
+    closeSelector(){
+      this.selectBook = null
+      this.isShowSelector = false
+    },
+    removeFromBookList() {
+      // 从书架中删除该书籍
+      if (this.selectBook) {
+        this.$store.dispatch('REMOVE_FROM_BOOKLIST', { _id: this.selectBook._id })
+      }
+      this.isShowSelector = false
+      this.selectId = ""
+    },
     readBook(item) {
       let bookId = item._id
       let bookTitle = item.title
@@ -101,6 +138,9 @@ export default {
   border-bottom-width: 2px;
   border-bottom-style: solid;
   border-bottom-color: #eee;
+}
+.row-box-list-item:active{
+  background-color: #eee;
 }
 .row-book-img-panel {
   width: 120px;

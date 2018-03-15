@@ -1,7 +1,7 @@
 <template>
   <div>
     <view-header title="分类" :isShowBack="true" @back="goback"></view-header>
-    <scroller class="scroller">
+    <scroller class="scroller" :style="{height:deviceHeight-60+'px'}">
       <div class="category-group" v-if="male">
       <div class="category-type">
         <text class="category-type-text">男生</text>
@@ -19,6 +19,17 @@
       </div>
       <div class="category-list">
          <div class="list-box" v-for="(item,index) in female" :key="index" @click="goBookList(item,'female')">
+          <text class="box-title">{{item.name}}</text>
+          <text class="box-count">{{item.bookCount}}本</text>
+        </div>
+      </div>
+      </div>
+      <div class="category-group">
+      <div class="category-type">
+        <text class="category-type-text">漫画</text>
+      </div>
+      <div class="category-list">
+         <div class="list-box" v-for="(item,index) in picture" :key="index" @click="goBookList(item,'press')">
           <text class="box-title">{{item.name}}</text>
           <text class="box-count">{{item.bookCount}}本</text>
         </div>
@@ -44,7 +55,9 @@ export default {
   name: 'category',
   data() {
     return {
-      categoryInfo: null
+      categoryInfo: null,
+
+      deviceHeight: 0
     }
   },
   components: {
@@ -65,6 +78,8 @@ export default {
     }
   },
   created() {
+    let env = weex.config.env
+    this.deviceHeight = env.deviceHeight * env.scale
     this.getCategoryInfo()
   },
   methods: {
@@ -72,20 +87,25 @@ export default {
       this.$router.back()
     },
     getCategoryInfo() {
-      this.request('/cats/lv2/statistics', 1, data => {
-        if (data.ok) {
-          this.categoryInfo = data
-        }
-      })
+      this.request(
+        '/cats/lv2/statistics',
+        1,
+        data => {
+          if (data.ok) {
+            this.categoryInfo = data
+          }
+        },
+        false
+      )
     },
-    goBookList(item,gender){
+    goBookList(item, gender) {
       this.jump({
         name: 'categorybook',
         query: {
           gender: gender,
           type: 'hot',
           major: item.name,
-          minor:''
+          minor: ''
         }
       })
     }
@@ -97,7 +117,8 @@ export default {
 }
 
 .scroller {
-  height: 1212px;
+  /* height: 1212px; */
+  margin-top: 120px;
 }
 .category-group {
 }

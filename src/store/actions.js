@@ -79,6 +79,7 @@ export function REMOVE_FROM_BOOKLIST({ state, dispatch }, { _id }) {
       break
     }
   }
+  console.log('REMOVE_FROM_BOOKLIST')
   storage.setItem('BOOKLIST', list, (e) => {
     if (e.result === 'success') {
       dispatch('GET_BOOKLIST')
@@ -98,22 +99,30 @@ export function REMOVE_FROM_BOOKLIST({ state, dispatch }, { _id }) {
 
 // 获取本地章节信息
 export function GET_CHAPTERINFO({ state, commit }) {
-  storage.getItem('CHAPTERINFO', (e) => {
-    if (e.data === 'undefined') {
-      storage.setItem('CHAPTERINFO', '[]')
-    }
-    let chapterinfo = e.data && e.data !== 'undefined' ? JSON.parse(e.data) : []
-    commit('SET_CHAPTERINFO', { chapterinfo } || [])
-  })
+  return new Promise((resolve, reject) => {
+    storage.getItem('CHAPTERINFO', (e) => {
+      if (e.data === 'undefined') {
+        storage.setItem('CHAPTERINFO', '{}')
+      }
+      let chapterinfo = e.data && e.data !== 'undefined' ? JSON.parse(e.data) : {}
+      commit('SET_CHAPTERINFO', { chapterinfo } || {})
+      resolve()
+    })
+  }
+  )
 }
 
 export function SET_CHAPTERINFO({ state, dispatch }, { info }) {
   let list = state.ChapterInfo
-  list.push(info)
-  storage.setItem('CHAPTERINFO', JSON.stringify(list), (e) => {
-    if (e.result === 'success') {
-      dispatch('GET_CHAPTERINFO')
-    }
+  list[info.book] = info
+  return new Promise((resolve, reject) => {
+    storage.setItem('CHAPTERINFO', JSON.stringify(list), (e) => {
+      console.log(e)
+      if (e.result === 'success') {
+        dispatch('GET_CHAPTERINFO')
+        resolve()
+      }
+    })
   })
 }
 
@@ -122,8 +131,8 @@ export function GET_SETTINGCONFIG({ commit }) {
     if (e.data === 'undefined') {
       storage.setItem('SETTINGCONFIG', JSON.stringify(defaultSetting))
     }
-    let config = e.data && e.data !== 'undefined' ? JSON.parse(e.data) : []
-    commit('SET_SETTINGCONFIG', { config } || [])
+    let config = e.data && e.data !== 'undefined' ? JSON.parse(e.data) : {}
+    commit('SET_SETTINGCONFIG', { config } || {})
   })
 }
 export function SET_SETTINGCONFIG({ state, dispatch }, config) {
@@ -139,7 +148,7 @@ export function GET_MARKINFO({ commit }) {
     if (e.data === 'undefined') {
       storage.setItem('MARKINFO', '{}')
     }
-    let markinfo = e.data && e.data !== 'undefined' ? JSON.parse(e.data) : []
+    let markinfo = e.data && e.data !== 'undefined' ? JSON.parse(e.data) : {}
     commit('SET_MARKINFO', { markinfo } || {})
   })
 }
@@ -157,38 +166,44 @@ export function SET_MARKINFO({ state, dispatch }, { bookId, markinfo }) {
 
 // 获取api缓存数据
 export function getApiCache({ commit }) {
-  storage.getItem('APICACHE', (e) => {
-    if (e.data === 'undefined') {
-      storage.setItem('APICACHE', '{}')
-    }
-    let apicache = e.data && e.data !== 'undefined' ? JSON.parse(e.data) : []
-    commit('SET_APICACHE', { apicache } || [])
+  return new Promise((resolve, reject) => {
+    storage.getItem('APICACHE', (e) => {
+      if (e.data === 'undefined') {
+        storage.setItem('APICACHE', '{}')
+      }
+      let apicache = e.data && e.data !== 'undefined' ? JSON.parse(e.data) : {}
+      resolve(apicache)
+      // commit('SET_APICACHE', { apicache } || [])
+    })
   })
+
 }
 // 设置api缓存
 export function setApiCache({ dispatch, state }, { api, result }) {
   let list = state.ApiCache
   list[api] = result
-  storage.setItem('APICACHE', JSON.stringify(list), (e) => {
-    if (e.result === 'success') {
-      dispatch('getApiCache')
-    }
-  })
+  storage.setItem('APICACHE', JSON.stringify(list)
+    // , (e) => {
+    //   if (e.result === 'success') {
+    //     // dispatch('getApiCache')
+    //   }
+    // }
+  )
 }
 
 // 清理本地缓存
 export function clearStorage({ dispatch }) {
   // // 清理章节缓存
-  // storage.setItem('CHAPTERINFO', '[]', (e) => {
-  //   if (e.result === 'success') {
-  //     dispatch('GET_CHAPTERINFO')
-  //     modal.toast({
-  //       message: '清理缓存成功!',
-  //       duration: 1
-  //     })
-  //   }
-  // })
-  storage.setItem('SETTINGCONFIG',  JSON.stringify(defaultSetting), (e) => {
+  storage.setItem('CHAPTERINFO', '{}', (e) => {
+    if (e.result === 'success') {
+      dispatch('GET_CHAPTERINFO')
+      modal.toast({
+        message: '清理章节缓存成功!',
+        duration: 1
+      })
+    }
+  })
+  storage.setItem('SETTINGCONFIG', JSON.stringify(defaultSetting), (e) => {
     if (e.result === 'success') {
       dispatch('GET_SETTINGCONFIG')
       modal.toast({

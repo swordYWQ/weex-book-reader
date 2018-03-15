@@ -1,21 +1,26 @@
 <template>
-     <!-- <div class="read-view"> -->
-       <div class="read-view">
-         <div class="read-content" :style="{'background-color':readTheme?readTheme.bgcolor:'#FFF'}">
-        <text ref="p-title" class="p-title" :style="{'color':readTheme?readTheme.color:'#333'}">{{nowChapterTitle}}</text>
+       <!-- <div class="read-view" @click="showSetting"  @swipe="swipePage" :style="{'background-color':readTheme?readTheme.bgcolor:'#FFF',height:deviceHeight+'px'}">
+         <div ref="page-group" class="read-content" :style="{height:deviceHeight+'px'}">
+            <text ref="p-title" class="p-title" :style="{'color':readTheme?readTheme.color:'#333'}">{{nowChapterTitle}}</text>
         
-        <text v-for="(item,index) in chapterBodyList" :key="index" class="p-item"  :style="{'color':readTheme?readTheme.color:'#333','font-size':settingConfig.readFontSize||56}">
-          {{item}}
-        </text>
+            <text ref="p-item" v-for="(item,index) in chapterBodyList" :key="index" class="p-item"  :style="{'color':readTheme?readTheme.color:'#333','font-size':settingConfig?settingConfig.readFontSize:40}">
+              {{item}}
+            </text>
         </div>
-        <!-- <div class="read-footer">
-        <text class="now-time" :style="{'color':readTheme?readTheme.color:'#333','font-size':settingConfig.readFontSize||56}">{{nowTime}}</text>
-       </div>
-       </div> -->
-      </div>
+      </div> -->
+      <scroller class="read-view" @click="showSetting" scroll-direction="horizontal" :offset-accuracy="750" :style="{'background-color':readTheme?readTheme.bgcolor:'#FFF',height:deviceHeight+'px'}">
+        <div ref="page-group" class="read-content" :style="{height:deviceHeight+'px'}">
+            <text ref="p-title" class="p-title" :style="{'color':readTheme?readTheme.color:'#333'}">{{nowChapterTitle}}</text>
+        
+            <text ref="p-item" v-for="(item,index) in chapterBodyList" :key="index" class="p-item"  :style="{'color':readTheme?readTheme.color:'#333','font-size':settingConfig?settingConfig.readFontSize:40}">
+              {{item}}
+            </text>
+        </div>
+      </scroller>
 </template>
 <script>
 var dom = weex.requireModule('dom')
+var animation = weex.requireModule('animation')
 export default {
   props: {
     nowChapterTitle: {
@@ -27,6 +32,17 @@ export default {
       default: () => {
         return []
       }
+    },
+    page: {
+      type: Number
+    }
+  },
+  data() {
+    return {
+      deviceHeight: 0,
+      // page: 0,
+      state: '',
+      lastPage: 0
     }
   },
   computed: {
@@ -37,8 +53,8 @@ export default {
       return this.$store.state.settingConfig
     },
     readTheme() {
-      let index = this.settingConfig.readTheme
-      let list = this.settingConfig.readThemeList
+      let index = this.settingConfig ? this.settingConfig.readTheme : ''
+      let list = this.settingConfig ? this.settingConfig.readThemeList : []
       for (let i = 0; i < list.length; i++) {
         let item = list[i]
         if (item.name === index) {
@@ -46,27 +62,101 @@ export default {
         }
       }
       return null
+    },
+    translateX() {
+      //let env = weex.config.env
+      return this.page * 750 * -1 //* env.scale
+    },
+    pageGroup() {
+      return this.$refs['page-group']
     }
   },
+  created() {
+    let env = weex.config.env
+    this.deviceHeight = env.deviceHeight * env.scale
+
+    // this.getLastPage()
+    // this.pageGroupAnimate(0)
+  },
   methods: {
-    scrollToTop() {
-      let pTitle = this.$refs['p-title']
-      if (pTitle) {
-        dom.scrollToElement(pTitle, {})
+    showSetting() {
+      this.$emit('showSetting')
+    },
+    swipePage(e) {
+      if (e.direction === 'right') {
+        this.prevPage()
+        // this.$emit('prevPage')
+      } else if (e.direction === 'left') {
+        this.nextPage()
+        // this.$emit('nextPage')
       }
     },
-    prevChapter() {
-      // this.nowmark = this.nowmark === 0 ? 0 : this.nowmark - 1
-      // this.getChapterContent(this.chapterList[this.nowmark])
-      this.scrollToTop()
-      this.$emit('prevChapter')
+    prevPage() {
+      this.state = 'prev'
+      if (this.page == 0) {
+        this.$emit('prevChapter')
+      } else {
+        // this.page--
+        this.$emit('changePage', this.page - 1)
+        // this.pageGroupAnimate()
+      }
     },
-    nextChapter() {
-      this.scrollToTop()
-      this.$emit('nextChapter')
-      // this.nowmark =
-      //   this.nowmark === this.chapterList.length - 1 ? 0 : this.nowmark + 1
-      // this.getChapterContent(this.chapterList[this.nowmark])
+    nextPage() {
+      this.state = 'next'
+      if (this.page >= this.lastPage) {
+        this.$emit('nextChapter')
+      } else {
+        // this.page++
+        this.$emit('changePage', this.page + 1)
+        this.pageGroupAnimate()
+      }
+    },
+    pageGroupAnimate(duration) {
+      this.$nextTick(() => {
+        let pageGroup = this.$refs['page-group']
+        animation.transition(pageGroup, {
+          styles: {
+            transform: `translateX(${this.translateX}px)`
+          },
+          duration: duration ? duration : 300, //ms
+          timingFunction: 'ease',
+          delay: 0 //ms
+        })
+      })
+    },
+    // getLastPage() {
+    //   let pItems = this.$refs['p-item']
+    //   if (pItems.length) {
+    //     dom.getComponentRect(pItems[this.chapterBodyList.length - 1], e => {
+    //       console.log(`left:${e.size.left}`)
+    //       this.lastPage = (e.size.left ? e.size.left : 0) / 750
+    //       console.log(`lastPage:${this.lastPage}`)
+    //     })
+    //   }
+    // }
+  },
+  watch: {
+    chapterBodyList: {
+      deep: true,
+      handler(v, ov) {
+        if (v != ov) {
+          this.$nextTick(() => {
+            // this.getLastPage()
+            if (this.state === 'next') {
+              // 下一页
+              this.$emit('changePage', 0)
+              // this.pageGroupAnimate(0)
+            } else if (this.state === 'prev') {
+              // 上一页
+              this.$emit('changePage', this.lastPage)
+              // this.pageGroupAnimate(0)
+            } else if (this.state === 'go') {
+              // 直接跳转章节
+              // this.pageGroupAnimate(0)
+            }
+          })
+        }
+      }
     }
   }
 }
@@ -74,31 +164,27 @@ export default {
 <style scoped>
 .read-view {
   width:750px;
-  height: 1334px;
+  /* height: 1334px; */
+  /* overflow: hidden; */
+  /* position: relative; */
 }
-.read-content{
-  /* width:auto; */
-  height: 1334px;/*1294px;*/
-  /* flex: 1; */
-  /* flex-direction: column; */
-  /* display: inline-flex; */
-  /* padding-top: 20px; */
-  position: absolute;
+.read-content {
+  /* position: absolute;
   top: 0;
-  left: 0;
+  left: 0; */
   flex-direction: column;
   flex-wrap: wrap;
-  /* column-width: 750px; */
+  /* transform: translate(0px); */
 }
 .p-title {
-  width:750px;
+  /* width:750px; */
   padding-left: 20px;
   padding-right: 20px;
   font-weight: 700;
   font-size: 50;
 }
 .p-item {
-  width:750px;
+  width: 750px;
   padding-left: 20px;
   padding-right: 20px;
 }
@@ -106,20 +192,20 @@ export default {
   font-size: 35px;
 }
 .read-footer {
-  position:absolute;
+  /* position:absolute;
   bottom:0;
   left:0;
   height: 40px;
   padding-left: 20px;
-  padding-right: 20px;
+  padding-right: 20px; */
 }
 
 .toggle-chapter {
-  flex-direction: row;
+  /* flex-direction: row;
   justify-content: space-between;
   align-items: center;
   padding-top: 20px;
-  padding-bottom: 20px;
+  padding-bottom: 20px; */
 }
 .chapter-prev {
 }

@@ -1,30 +1,37 @@
 <template>
   <div @androidback="back">
+    <!-- <keep-alive> -->
     <router-view style="flex:1"></router-view>
-    <wxc-loading :show="loadingState"
+    <!-- <wxc-loading :show="loadingState"
                  type="default"
                  loading-text="加载中"
-                 :interval="0"></wxc-loading>
+                 :interval="0"></wxc-loading> -->
+                 <!-- </keep-alive> -->
+                 <Loadings ref="loadings" :isShow="isShow" v-if="isShow"></Loadings>
   </div>
 </template>
 
 <script>
 var globalEvent = weex.requireModule('globalEvent')
 var domModule = weex.requireModule('dom')
-var modal = weex.requireModule('modal')
+// var modal = weex.requireModule('modal')
 var close = weex.requireModule('close')
-import { WxcLoading } from 'weex-ui'
+// import { WxcLoading } from 'weex-ui'
+import Loadings from './components/loading.vue'
 export default {
-  components: { 'wxc-loading': WxcLoading },
+  components: {
+    // 'wxc-loading': WxcLoading,
+    Loadings: Loadings
+  },
   data() {
     return {
       preClose: false
     }
   },
   computed: {
-    loadingState() {
+    isShow() {
       return this.$store.state.loadingState
-    }
+    },
   },
   created() {
     globalEvent.addEventListener('androidback', e => {
@@ -40,6 +47,13 @@ export default {
       src: "url('http://at.alicdn.com/t/font_562191_gi5uyqubw41s8aor.ttf')"
     })
     // this.initLocalData()
+
+    // setTimeout(()=>{
+    //   console.log(weex.config.env)
+    //   console.log('isShow:',this.$refs.loadings.isShow)
+    //   console.log('loadingStyle:',this.$refs.loadings.loadingStyle)
+    //   console.log('loadingCenter:',this.$refs.loadings.loadingCenter)
+    // },5000)
   },
   methods: {
     back: function() {
@@ -55,13 +69,13 @@ export default {
           close.closeApp()
         } else {
           this.preClose = true
-          modal.toast({
+          this.toast({
             message: '再按一次返回关闭应用',
-            duration: 1
+            duration: 0.5
           })
-          this.setTimeout(() => {
+          setTimeout(() => {
             this.preClose = false
-          }, 1000)
+          }, 500)
         }
       } else {
         this.$router.back()

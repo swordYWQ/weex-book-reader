@@ -24,6 +24,11 @@
           </div>
         </div>
         <div class="cell">
+          <div class="panel" @click="debugPage">
+            <text class="text">调试</text>
+          </div>
+        </div>
+        <div class="cell">
           <div class="panel" @click="jump({name:'about'})">
             <text class="text">关于</text>
           </div>
@@ -33,15 +38,18 @@
     <!-- </div> -->
 </template>
 <script>
-var modal = weex.requireModule('modal')
+// var modal = weex.requireModule('modal')
 export default {
   name: 'category',
   methods:{
     set(){
-      modal.toast({
+      this.toast({
             message: '暂未开发',
             duration: 1
       })
+    },
+    debugPage(){
+      this.jump({name:'debug'})
     },
     clearStorage(){
       this.$store.dispatch('clearStorage')

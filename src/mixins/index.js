@@ -1,5 +1,6 @@
 import moment from 'moment'
 var stream = weex.requireModule('stream')
+var modal = weex.requireModule('modal')
 
 export default {
   methods: {
@@ -54,7 +55,7 @@ export default {
           urlPath = chapterHost + url
         }
       }
-      let ApiCache = this.$store.state.ApiCache
+
       let self = this
       let fetchFunc = () => {
         this.$store.commit('showloading')
@@ -65,29 +66,48 @@ export default {
             type: 'json',
             timeout: 5000
           },
-           (response)=> {
+          (response) => {
             if (response.ok) {
               this.$store.commit('closeloading')
               self.$store.dispatch('setApiCache', { api: urlPath, result: response.data })
               callback(response.data)
             } else {
               this.$store.commit('closeloading')
+              modal.toast({
+                message: '接口访问失败!',
+                duration: 1
+              })
               console.error('接口访问失败!')
             }
           }
         )
       }
-      if (!refresh) {
-        if (ApiCache[urlPath]) {
-          callback(ApiCache[urlPath])
+
+      let ApiCache = {}
+      this.$store.dispatch('getApiCache').then((apicache) => {
+        ApiCache = apicache
+        if (!refresh) {
+          if (ApiCache[urlPath]) {
+            callback(ApiCache[urlPath])
+          } else {
+            fetchFunc()
+          }
         } else {
           fetchFunc()
         }
-      } else {
-        fetchFunc()
-      }
+      })//state.ApiCache
+
+
+
+
     },
     // 日期处理函数
-    moment: moment
+    moment: moment,
+    // weex 模块modal函数
+    // 其中包括 toast, alert,confirm,prompt 方法
+    toast: modal.toast,
+    alert: modal.alert,
+    confirm: modal.confirm,
+    prompt: modal.prompt
   }
 }

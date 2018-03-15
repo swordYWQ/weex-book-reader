@@ -1,20 +1,13 @@
 <template>
-    <div v-if="bookList.length">
+    <div>
       <view-header :title="pageTitle||''" :isShowBack="true" @back="goback"></view-header>
-      <scroller class="scroller">
-      <!-- <div class="tab-sex">
-        <div class="tab-sex-item" :class="[rankTimeType===1?'select':'']" @click="changeRankType(1)">
-        <text class="tab-sex-item-text">周榜</text>
-        </div>
-        <div class="tab-sex-item" :class="[rankTimeType===2?'select':'']" @click="changeRankType(2)">
-        <text class="tab-sex-item-text" >月榜</text>
-         </div>
-         <div class="tab-sex-item" :class="[rankTimeType===3?'select':'']" @click="changeRankType(3)">
-        <text class="tab-sex-item-text" >总榜</text>
-         </div>
-      </div> -->
-      <list>
-        <cell v-for="(item,index) in bookList" :key="index" class="book-panel" @click="lookBookInfo(item)">
+      <list class="scroller" @loadmore="loadMoreBook">
+      <refresh class="refresh" @refresh="onrefresh" :display="refreshing ? 'show' : 'hide'">
+      <text class="indicator-text">刷新中 ...</text>
+      <loading-indicator class="indicator"></loading-indicator>
+    </refresh>
+      <!-- <list> -->
+        <cell v-if="bookList.length" v-for="(item,index) in bookList" :key="index" class="book-panel" @click="lookBookInfo(item)">
           <div class="book-img-panel">
             <image class="book-img" :src="imageHost+item.cover"></image>
           </div>
@@ -24,81 +17,52 @@
             <text class="book-short-info">{{item.shortIntro}}</text>
           </div>
         </cell>
-      </list>
-      <div class="more-book-row" @click="loadMoreBook">
+      <!-- </list> -->
+      <!-- <loading class="loading" @loading="onloading" :display="loadinging ? 'show' : 'hide'">
+          <text class="indicator-text">更多书籍 ...</text>
+          <loading-indicator class="indicator"></loading-indicator>
+        </loading> -->
+      <!-- <div class="more-book-row" @click="loadMoreBook">
         <text class="more-book-text">更多书籍</text>
-      </div>
+      </div> -->
         
-    </scroller>
+    </list>
     </div>
 </template>
 <script>
 // var stream = weex.requireModule('stream')
 import viewHeader from '../components/view-header.vue'
 export default {
-  name: 'book-list',
+  name: 'category-book',
   components: {
     'view-header': viewHeader
   },
   data() {
     return {
-      // epub: [],
-      // male: [],
-      // female: [],
-      // picture: [],
-
-      // isShowMore: false,
-
       rankTimeType: 1,
-      // bookInfo: null,
 
       len: 0, // 默认显示的书籍列表数量
-      bookList: []
+      bookList: [],
+      refreshing: false,
+      loadinging: false
     }
   },
   computed: {
     imageHost() {
       return this.$store.state.imageHost
     },
-    // rankId() {
-    //   let route = this.$route
-    //   if (this.rankTimeType === 1) {
-    //     //周榜
-    //     return route.query.week
-    //   } else if (this.rankTimeType === 2) {
-    //     //月榜
-    //     return route.query.month
-    //   } else if (this.rankTimeType === 3) {
-    //     //总榜
-    //     return route.query.total
-    //   }
-    //   return ''
-    // },
     pageTitle() {
       return this.$route.query.major
     }
-    // totalBooks() {
-    //   if (this.bookInfo) {
-    //     return this.bookInfo.books
-    //   }
-    //   return []
-    // }
   },
   created() {
-    this.getBookList(0)
+    this.getBookList(0,false)
   },
   methods: {
     goback() {
       this.$router.back()
     },
-    // changeRankType(value) {
-    //   this.rankTimeType = value
-    //   this.bookList = []
-    //   this.getBookList()
-    // },
-    getBookList(index) {
-      // console.log(this.rankId)
-      // if (this.rankId) {
+    getBookList(index,refresh) {
       let query = this.$route.query
       let gender = query.gender
       let type = query.type
@@ -123,25 +87,27 @@ export default {
             data.books.forEach(item => {
               this.bookList.push(item)
             })
+            this.refreshing = false
+            this.loadinging = false
             // this.refreshBookList()
           }
-        }
+        },
+        refresh
       )
       // }
     },
+     onrefresh (event) {
+        this.refreshing = true
+        this.bookList = []
+        this.getBookList(0,true)
+      },
+     onloading (event) {
+        this.loadinging = true
+        this.loadMoreBook()
+      },
     loadMoreBook() {
-      // this.len += 10
-      this.getBookList(this.bookList.length - 1)
-      // this.refreshBookList()
+      this.getBookList(this.bookList.length - 1,false)
     },
-    // refreshBookList() {
-    //   this.totalBooks.forEach((item, index) => {
-    //     if (index >= this.len && index < this.len + 10) {
-    //       this.bookList.push(item)
-    //     }
-    //   })
-    //   this.len = this.bookList.length
-    // },
     lookBookInfo(item) {
       this.jump({ name: 'bookinfo', query: { bookId: item._id } })
     }
@@ -151,6 +117,7 @@ export default {
 <style scoped>
 .scroller {
   height: 1194px;
+  margin-top:120px;
 }
 .tab-sex {
   flex-direction: row;
@@ -255,6 +222,15 @@ export default {
   height: 80px;
   justify-content: center;
   align-items: center;
+}
+.more-book-text{
+  font-size: 30px;
+}
+
+.indicator-text{
+  text-align: center;
+  font-size: 30px;
+  color: #aaa;
 }
 </style>
 

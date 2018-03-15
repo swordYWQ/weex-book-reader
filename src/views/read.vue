@@ -1,42 +1,32 @@
 <template>
-  <div class="reading-view">
+  <div class="reading-view" :style="{height:deviceHeight+'px'}">
    
     <!--小说阅读主体-->
-    <div class="reading-content">
+    <div class="reading-content" :style="{height:deviceHeight+'px'}">
       <!-- <div class="content-top" :style="{'background-color':readingStyles.bgColor}">
         <text class="p-item">{{nowChapterTitle}}</text>
       </div> -->
 
       <!--滚动翻阅-->
-      <scroller-read-view :nowChapterTitle="nowChapterTitle" :chapterBodyList="chapterBodyList" @prevChapter="prevChapter" @nextChapter="nextChapter" @showSetting="isShowSetting=!isShowSetting"></scroller-read-view>
+      <scroller-read-view ref="scrollerreadview" :nowChapterTitle="nowChapterTitle" :chapterBodyList="chapterBodyList" @prevChapter="prevChapter" @nextChapter="nextChapter" @showSetting="showSettingView"></scroller-read-view>
       
-      <!--滑动翻页-->
-      <!-- <swipe-read-view :nowChapterTitle="nowChapterTitle" :chapterBodyList="chapterBodyList" @prevChapter="prevChapter" @nextChapter="nextChapter" @click="isShowSetting=!isShowSetting"></swipe-read-view> -->
-      <!-- <scroller class="content-body">
-        <text ref="p-title" class="p-item" :style="{'color':readTheme?readTheme.color:'#333','font-size':settingConfig.readFontSize||56}">{{nowChapterTitle}}</text>
-        <text v-for="(item,index) in chapterBodyList" :key="index" class="p-item" @click="isShowSetting=!isShowSetting" :style="{'color':readTheme?readTheme.color:'#333','font-size':settingConfig.readFontSize||56}">
-          {{item}}
-        </text>
-        <div class="toggle-chapter" v-if="chapter">
-          <text class="chapter-prev" @click="prevChapter">上一章</text>
-          <text class="chapter-next" @click="nextChapter">下一章</text>
-        </div>
-      </scroller> -->
-      <!-- <div class="content-footer">
-        <text class="now-time" :style="{'color':readTheme?readTheme.color:'#333','font-size':settingConfig.readFontSize||56}">{{nowTime}}</text>
-      </div> -->
+      <!--滑动翻页  @prevChapter="prevChapter" @nextChapter="nextChapter"-->
+      <!-- <swipe-read-view ref="swipereadview" :page="page" :nowChapterTitle="nowChapterTitle" :chapterBodyList="chapterBodyList" @showSetting="showSettingView" @prevChapter="prevChapter" @nextChapter="nextChapter" @changePage="changePage"></swipe-read-view> -->
+
     </div>
 
     <!--小说阅读设置-->
     <!-- <read-setting  v-if="isShowSetting" :bookTitle="bookTitle" @on-hide-setting="isShowSetting=false" @on-menu="toggleChapterView" @on-exit="goback"></read-setting> -->
-      <div class="read-setting" v-if="isShowSetting">
-    <div class="seting-none" @click="HideSetting"></div>
-    <div class="setting-top">
-      <text class="exit-icon" @click="exit">&#xe641;</text>
+    <!-- v-if="isShowSetting" -->
+      <div class="read-setting" v-if="isShowSetting" :style="{height:deviceHeight-35+'px'}">
+        <!-- <template> -->
+    <div class="seting-none"  v-if="isShowSetting" @click="HideSetting" :style="{height:deviceHeight+'px'}"></div>
+    <div class="setting-top" ref="settingTop">
+      <text class="exit-icon" @click="goback">&#xe641;</text>
       <text class="book-title">{{bookTitle}}</text>
     </div>
 
-    <div class="setting-body">
+    <div class="setting-body" ref="settingBody">
     <div class="setting-view" v-if="showSet">
       <list>
         <cell class="setting-row">
@@ -76,31 +66,31 @@
     </div>
     </div>
   </div>
+  <!-- </template> -->
      <!--小说章节内容-->
     <!-- <read-chapter ref="chapter" :isShowChapter="isShowChapter" :bookTitle="bookTitle" :chapterList="chapterList" @on-close="toggleChapterView" @on-select-chapter="goToChapter"></read-chapter> -->
- <div class="read-chapter" ref="chapter">
+ <div class="read-chapter" ref="chapter" v-if="chapterList.length&&isShowChapter">
    <!--遮罩-->
-    <div ref="covermodal" class="cover-modal" v-if="isShowChapter" @click="toggleChapterView(false)"></div>
+    <div ref="covermodal" class="cover-modal" :style="{height:deviceHeight+'px'}" @click="toggleChapterView(false)"></div>
 
     <div class="chapter-group">
       <div class="chapter-header">
         <div class="chapter-header-label">
           <text class="chapter-header-text">目录</text>
         </div>
-        <!-- <div class="chapter-book-title">
-          <text class="chapter-book-title-text">{{bookTitle}}</text>
-        </div> -->
-        <div class="chapter-sort-btn">
-          <text class="chapter-sort-btn-text" @click="scrollToBottom">顶部/底部</text>
+        <div class="chapter-sort-btn" @click="scrollToBottom">
+          <text class="chapter-sort-btn-text">顶部/底部</text>
         </div>
       </div>
-      <scroller class="chapter-scroller">
-        <!-- <list class="chapter-list"> -->
-          <div ref="chaptercell" class="chapter-cell" v-for="(item,index) in chapterList" :key="index" @click="goChapter(index)">
+      <list class="chapter-scroller" :style="{height:deviceHeight-35+'px'}">
+        <refresh class="refresh" @refresh="onrefresh" :display="refreshing ? 'show' : 'hide'">
+      <text class="indicator-text">刷新中 ...</text>
+      <loading-indicator class="indicator"></loading-indicator>
+      </refresh>
+          <cell ref="chaptercell" class="chapter-cell" v-for="(item,index) in chapterList" :key="index" @click="goChapter(index)">
             <text class="chapter-cell-text">{{item.title}}</text>
-          </div>
-        <!-- </list> -->
-        </scroller>
+          </cell>
+        </list>
       </div>
   </div>
 
@@ -110,20 +100,15 @@
 var animation = weex.requireModule('animation')
 var dom = weex.requireModule('dom')
 
-// import readChapter from '../components/read-chapter.vue'
-// import readSetting from '../components/read-setting.vue'
 import scrollerReadView from '../components/scroller-read-view.vue'
 import swipeReadView from '../components/swipe-read-view.vue'
 export default {
   name: 'readingview',
   components: {
-    //   'read-chapter': readChapter,
-    //   'read-setting': readSetting
     'scroller-read-view': scrollerReadView,
     'swipe-read-view': swipeReadView
   },
   data() {
-    let bookId = this.$route.query.bookId
     return {
       Toc: null,
       isShowChapter: false, // 是否显示章节列表
@@ -134,9 +119,12 @@ export default {
       chapter: null, //章节内容
       // chapterContent: null,
 
-      nowmark: this.$store.state.markInfo[bookId]
-        ? this.$store.state.markInfo[bookId].chapter
-        : 0
+      nowchapter: 0,
+      page: 0,
+
+      refreshing: false,
+
+      deviceHeight: 0
     }
   },
   computed: {
@@ -144,11 +132,10 @@ export default {
       return this.$store.state.settingConfig
     },
     readTheme() {
-      let index = this.settingConfig?this.settingConfig.readTheme:''
-      let list = this.settingConfig.readThemeList
+      let index = this.settingConfig ? this.settingConfig.readTheme : ''
+      let list = this.settingConfig ? this.settingConfig.readThemeList : []
       for (let i = 0; i < list.length; i++) {
         let item = list[i]
-        console.log(item)
         if (item.name === index) {
           return item
         }
@@ -169,13 +156,8 @@ export default {
     },
     chapterList() {
       let bookId = this.$route.query.bookId
-      if (this.chapterInfo && this.chapterInfo.length > 0) {
-        for (let i = 0; i < this.chapterInfo.length; i++) {
-          let item = this.chapterInfo[i]
-          if (item.book === bookId) {
-            return item.chapters
-          }
-        }
+      if (JSON.stringify(this.chapterInfo) !== '{}') {
+        return this.chapterInfo[bookId] ? this.chapterInfo[bookId].chapters : []
       }
       return []
     },
@@ -185,38 +167,73 @@ export default {
     },
     nowChapterTitle() {
       return this.chapterList.length > 0
-        ? this.chapterList[this.nowmark].title
+        ? this.chapterList[this.nowchapter].title
         : '-'
     }
   },
   created() {
-    console.log(this.settingConfig)
+    let env = weex.config.env
+    this.deviceHeight = env.deviceHeight * env.scale
     this.init()
   },
   methods: {
     init() {
-      if (this.chapterList.length > 0) {
-        this.getChapterContent(this.chapterList[this.nowmark])
-      } else {
-        this.getChapterList()
-      }
+      this.$nextTick(() => {
+        let bookId = this.$route.query.bookId
+        this.nowchapter = this.markInfo[bookId]
+          ? this.markInfo[bookId].chapter
+          : 0
+        this.page = this.markInfo[bookId] ? this.markInfo[bookId].page : 0
+        if (this.chapterList.length > 0) {
+          this.getChapterContent(this.chapterList[this.nowchapter])
+        } else {
+          this.getChapterList()
+        }
+      })
     },
     goback() {
       this.$router.back()
     },
+    chapterAnimation(translateX, callback) {
+      var chapter = this.$refs.chapter || null
+      if (!chapter) return
+      animation.transition(
+        chapter,
+        {
+          styles: {
+            transform: `translateX(${translateX}px)`
+          },
+          duration: 100, //ms
+          timingFunction: 'ease'
+          // delay: 0 //ms
+        },
+        () => {
+          if (callback) {
+            callback()
+          }
+        }
+      )
+    },
     toggleChapterView(show) {
       // this.isShowSetting = false //隐藏设置面板
-
-      this.isShowChapter = show
-      var chapter = this.$refs.chapter
-      animation.transition(chapter, {
-        styles: {
-          transform: this.isShowChapter ? 'translateX(0)' : 'translateX(-750px)'
-        },
-        duration: 300, //ms
-        timingFunction: 'ease',
-        delay: 100 //ms
-      })
+      if (this.chapterList.length === 0) {
+        this.toast('章节列表为空!')
+        return
+      }
+      if (!this.isShowChapter) {
+        this.isShowChapter = show
+        this.$nextTick(() => {
+          this.chapterAnimation(0)
+        })
+      } else {
+        this.chapterAnimation(-750, () => {
+          this.isShowChapter = show
+        })
+      }
+    },
+    onrefresh(event) {
+      this.refreshing = true
+      this.getChapterList()
     },
     // 获取章节列表
     getChapterList() {
@@ -231,8 +248,21 @@ export default {
         data => {
           if (data.ok) {
             let chapterInfo = data.mixToc
-            this.$store.dispatch('SET_CHAPTERINFO', { info: chapterInfo })
-            this.getChapterContent(this.chapterList[0])
+            this.$store
+              .dispatch('SET_CHAPTERINFO', { info: chapterInfo })
+              .then(() => {
+                this.refreshing = false
+                let bookId = this.$route.query.bookId
+                if (JSON.stringify(chapterInfo) !== '{}') {
+                  let list = chapterInfo.chapters
+                  this.getChapterContent(list[this.nowchapter])
+                }
+              })
+          } else {
+            this.toast({
+              message: '获取章节列表失败，请换源或选择其他小说!',
+              duration: 1
+            })
           }
         }
       )
@@ -246,40 +276,109 @@ export default {
         this.request(`/chapter/${encodeURIComponent(link)}${p}`, 2, data => {
           if (data.ok) {
             this.chapter = data.chapter
+            this.$nextTick(()=>{
+              this.$refs.scrollerreadview.scrollToTop()
+            })
+          } else {
+            this.toast({
+              message: '获取章节内容失败，请换源或选择其他小说!',
+              duration: 1
+            })
           }
         })
       }
     },
     goToChapter(index) {
-      this.nowmark = index
-      this.getChapterContent(this.chapterList[this.nowmark])
+      this.nowchapter = index
+      if (this.$refs.swipereadview) {
+        this.$refs.swipereadview.state = 'go'
+      }
+      this.getChapterContent(this.chapterList[this.nowchapter])
       this.isShowChapter = false
     },
+    changePage(value) {
+      this.page = value
+    },
     prevChapter() {
-      this.nowmark = this.nowmark === 0 ? 0 : this.nowmark - 1
-      this.getChapterContent(this.chapterList[this.nowmark])
+      if (this.nowchapter === 0) {
+        this.toast({
+          message: '已经到第一章啦!'
+        })
+      } else {
+        this.nowchapter--
+        this.getChapterContent(this.chapterList[this.nowchapter])
+      }
     },
     nextChapter() {
-      this.nowmark =
-        this.nowmark === this.chapterList.length - 1 ? 0 : this.nowmark + 1
-      this.getChapterContent(this.chapterList[this.nowmark])
+      if (this.nowchapter === this.chapterList.length - 1) {
+        this.toast({
+          message: '已经到最后一章啦!'
+        })
+      } else {
+        this.nowchapter++
+        this.getChapterContent(this.chapterList[this.nowchapter])
+      }
     },
-
     lookMenu() {
-      // this.$emit('on-menu')
       this.toggleChapterView(true)
     },
-    exit() {
-      // this.$emit('on-exit')
-      this.$router.back()
+    showSettingView() {
+      this.isShowSetting = true
+      this.$nextTick(() => {
+        let settingTop = this.$refs.settingTop
+        let settingBody = this.$refs.settingBody
+        this.settingAnimation(settingTop, 0)
+         this.settingAnimation(settingBody, 0)
+      })
+    },
+    settingAnimation(ref, translateY, callback) {
+      animation.transition(
+        ref,
+        {
+          styles: {
+            transform: `translateY(${translateY}px)`
+          },
+          duration: 100, //ms
+          timingFunction: 'ease'
+          // delay: 0 //ms
+        },
+        () => {
+          if (callback) {
+            callback()
+          }
+        }
+      )
+    },
+    hideSettingView() {
+      let settingTop = this.$refs.settingTop
+      let settingBody = this.$refs.settingBody
+      Promise.all([
+        new Promise((resolve, reject) => {
+          this.settingAnimation(settingTop, -100, () => {
+            resolve()
+          })
+        }),
+        new Promise((resolve, reject) => {
+          this.settingAnimation(settingBody, 300, () => {
+            resolve()
+          })
+        })
+      ])
+        .then(() => {
+          this.isShowSetting = false
+        })
+        .catch(err => {
+          this.toast({
+            message: err,
+            duration: 1
+          })
+        })
     },
     HideSetting() {
-      // this.$emit('on-hide-setting')
-      this.isShowSetting = false
+      this.hideSettingView()
       this.showSet = false
     },
     showSetting() {
-      // this.isShowSetting = true
       this.showSet = true
     },
     changeFontSize(num) {
@@ -305,7 +404,7 @@ export default {
       if (this.chapterList.length > 0) {
         this.isScrollToBottom = !this.isScrollToBottom
         let index = this.chapterList.length - 1
-        if (this.isScrollToBottom) {
+        if (!this.isScrollToBottom) {
           const el = this.$refs.chaptercell[0]
           dom.scrollToElement(el, {})
         } else {
@@ -316,13 +415,26 @@ export default {
     }
   },
   watch: {
-    nowmark(v, ov) {
+    nowchapter(v, ov) {
       if (v != ov) {
         let bookId = this.$route.query.bookId
         this.$store.dispatch('SET_MARKINFO', {
           bookId: bookId,
           markinfo: {
-            chapter: v
+            chapter: this.nowchapter,
+            page: this.page
+          }
+        })
+      }
+    },
+    page(v, ov) {
+      if (v != ov) {
+        let bookId = this.$route.query.bookId
+        this.$store.dispatch('SET_MARKINFO', {
+          bookId: bookId,
+          markinfo: {
+            chapter: this.nowchapter,
+            page: this.page
           }
         })
       }
@@ -333,37 +445,13 @@ export default {
 <style scoped>
 .reading-view {
   width: 750px;
-  height: 1334px;
+  /* height: 1334px; */
 }
 
 .reading-content {
   width: 750px;
-  height: 1334px;
+  /* height: 1334px; */
 }
-/* .content-top {
-
-  height: 40px;
-  padding-left: 20px;
-  padding-right: 20px;
-} */
-
-/* .touch-modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 750px;
-  height: 1334px;
-  flex-direction: row;
-}
-.prev-box {
-  flex: 2;
-}
-.setting-box {
-  flex: 1;
-}
-.next-box {
-  flex: 2;
-} */
 
 /*设置面板*/
 .read-setting {
@@ -371,7 +459,7 @@ export default {
   top: 0;
   left: 0;
   width: 750px;
-  height: 1334px;
+  /* height: 1334px; */
   /* z-index: 1; */
 }
 .setting-top {
@@ -385,11 +473,15 @@ export default {
   align-items: center;
   background-color: #555;
   opacity: 1;
+  transform: translateY(-100px);
   /* z-index: 2; */
 }
 .seting-none {
+  position: fixed;
+  top: 0;
+  left: 0;
   width: 750px;
-  height: 1334px;
+  /* height: 1334px; */
   /* z-index: 1; */
   background-color: #000;
   opacity: 0.3;
@@ -415,6 +507,7 @@ export default {
   left: 0;
   z-index: 2;
   background-color: #555;
+  transform: translateY(300px);
 }
 
 .setting-view {
@@ -499,44 +592,49 @@ export default {
   background-color: #fff;
 }
 .chapter-header {
-  flex: 1;
-  position: relative;
+  /* width: 740px; */
+  /* position: relative; */
   flex-direction: row;
-  justify-content: flex-start;
+  justify-content: space-between;
   align-items: center;
   height: 60px;
 }
 .chapter-header-label {
-  flex: 1;
+  /* float: left; */
+  /* flex: 1; */
   /* position: absolute; */
-  /* left:10px; */
+  /* left: 10px; */
 }
 .chapter-header-text {
   font-size: 40px;
   text-align: center;
+  color: #333;
 }
 .chapter-book-title {
-  flex: 2;
+  /* flex: 2; */
 }
 .chapter-book-title-text {
   font-size: 40px;
   font-weight: 700;
   text-align: center;
+  color: #333;
 }
 
 .chapter-sort-btn {
-  flex: 1;
-  /* position: absolute;
-  right:10px; */
+  /* right: 10px; */
+  /* float:right; */
+  /* flex: 1; */
+  /* position: absolute; */
 }
 .chapter-sort-btn-text {
   font-size: 30px;
   text-align: center;
+  color: #333;
 }
 .chapter-scroller {
   /* flex: 5; */
   width: 600px;
-  height: 1264px;
+  /* height: 1264px; */
   padding-bottom: 20px;
 }
 .chapter-list {
@@ -550,17 +648,23 @@ export default {
 }
 .chapter-cell-text {
   font-size: 35px;
-  color: #aaa;
+  color: #444;
 }
 .cover-modal {
   width: 750px;
-  height: 1334px;
+  /* height: 1334px; */
   /* position: fixed;
   left: 0;
   top: 0; */
   /* z-index: 2; */
   background-color: #000;
   opacity: 0.5;
+}
+
+.indicator-text {
+  text-align: center;
+  font-size: 30px;
+  color: #aaa;
 }
 </style>
 

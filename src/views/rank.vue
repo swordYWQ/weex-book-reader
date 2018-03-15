@@ -9,6 +9,12 @@
         <div class="tab-sex-item" :class="[nowSex===2?'select':'']" @click="changeSex(2)">
         <text class="tab-sex-item-text" >女生</text>
          </div>
+         <div class="tab-sex-item" :class="[nowSex===3?'select':'']" @click="changeSex(3)">
+        <text class="tab-sex-item-text" >漫画</text>
+         </div>
+         <div class="tab-sex-item" :class="[nowSex===4?'select':'']" @click="changeSex(4)">
+        <text class="tab-sex-item-text" >其他</text>
+         </div>
       </div>
         <div class="cell">
           <div class="panel" v-for="(item,index) in rankList" :key="index" v-if="!item.collapse" @click="goBookList(item)">
@@ -48,7 +54,7 @@ export default {
 
       isShowMore: false,
 
-      nowSex: 1 // 性别 1为男 2为女
+      nowSex: 1 // 性别 1为男 2为女 3为漫画 4为其他
     }
   },
   computed: {
@@ -60,7 +66,11 @@ export default {
         return this.male
       } else if (this.nowSex === 2) {
         return this.female
-      }
+      } else  if (this.nowSex === 3) {
+        return this.picture
+      } else  if (this.nowSex === 4) {
+        return this.epub
+      } 
     }
   },
   created() {
@@ -111,6 +121,7 @@ export default {
 <style scoped>
 .scroller {
   /* height:calc(100% - 240px); */
+  margin-top: 120px;
 }
 .tab-sex {
   flex-direction: row;

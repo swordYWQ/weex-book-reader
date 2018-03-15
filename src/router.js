@@ -15,7 +15,11 @@ import BookInfo from './views/bookinfo.vue'
 import ReadingView from './views/read.vue'
 import CategoryView from './views/category.vue'
 import CategoryBook from './views/categorybook.vue'
+import Search from './views/search.vue'
+import SearchResult from './views/searchresult.vue'
 import About from './views/about.vue'
+
+import DebugView from './views/debug.vue'
 
 Vue.use(VueRouter)
 
@@ -45,7 +49,10 @@ export default new VueRouter({
     { path: '/categorybook', name: 'categorybook', component: CategoryBook },
     { path: '/bookinfo', name: 'bookinfo', component: BookInfo },
     { path: '/read', name: 'read', component: ReadingView },
+    { path: '/search', name: 'search', component: Search },
+    { path: '/searchresult', name: 'searchresult', component: SearchResult },
     { path: '/about', name: 'about', component: About },
+    { path: '/debug', name: 'debug', component: DebugView },
 
     // { path: '/top', component: createStoriesView('top') },
     // { path: '/new', component: createStoriesView('new') },

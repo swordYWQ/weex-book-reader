@@ -1,7 +1,8 @@
 <template>
-    <div v-if="bookInfo">
-      <view-header :title="bookInfo.title" :isShowBack="true" @back="goback"></view-header>
-      <scroller class="scroller">
+    <div>
+      <view-header :title="bookInfo?bookInfo.title:'-'" :isShowBack="true" @back="goback"></view-header>
+      <!-- <scroller class="scroller"> -->
+        <div class="book-list-page">
       <div class="tab-sex">
         <div class="tab-sex-item" :class="[rankTimeType===1?'select':'']" @click="changeRankType(1)">
         <text class="tab-sex-item-text">周榜</text>
@@ -13,8 +14,12 @@
         <text class="tab-sex-item-text" >总榜</text>
          </div>
       </div>
-      <list>
-        <cell v-for="(item,index) in bookList" :key="index" class="book-panel" @click="lookBookInfo(item)">
+      <list class="scroller"  @loadmore="loadMoreBook">
+        <refresh class="refresh" @refresh="onrefresh" :display="refreshing ? 'show' : 'hide'">
+      <text class="indicator-text">刷新中 ...</text>
+      <loading-indicator class="indicator"></loading-indicator>
+    </refresh>
+        <cell v-if="bookInfo" v-for="(item,index) in bookList" :key="index" class="book-panel" @click="lookBookInfo(item)">
           <div class="book-img-panel">
             <image class="book-img" :src="imageHost+item.cover"></image>
           </div>
@@ -24,12 +29,19 @@
             <text class="book-short-info">{{item.shortIntro}}</text>
           </div>
         </cell>
+        <!-- <loading class="loading" @loading="onloading" :display="loadinging ? 'show' : 'hide'">
+          <text class="indicator-text">更多书籍 ...</text>
+          <loading-indicator class="indicator"></loading-indicator>
+        </loading> -->
+        <!-- <cell class="more-book-row" @click="loadMoreBook">
+          <text class="more-book-text">更多书籍</text>
+        </cell> -->
       </list>
-      <div class="more-book-row" @click="loadMoreBook">
+      <!-- <div class="more-book-row" @click="loadMoreBook">
         <text class="more-book-text">更多书籍</text>
-      </div>
-        
-    </scroller>
+      </div> -->
+        </div>
+    <!-- </scroller> -->
     </div>
 </template>
 <script>
@@ -53,7 +65,10 @@ export default {
       bookInfo: null,
 
       len: 0, // 默认显示的书籍列表数量
-      bookList: []
+      bookList: [],
+
+      refreshing: false,
+      loadinging: false,
     }
   },
   computed: {
@@ -82,7 +97,7 @@ export default {
     }
   },
   created() {
-    this.getBookList()
+    this.getBookList(false)
   },
   methods: {
     goback(){
@@ -90,11 +105,11 @@ export default {
     },
     changeRankType(value) {
       this.rankTimeType = value
+      this.len = 0
       this.bookList = []
-      this.getBookList()
+      this.getBookList(false)
     },
-    getBookList() {
-      console.log(this.rankId)
+    getBookList(refresh) {
       if (this.rankId) {
         // this.len = 10
         this.request('/ranking/' + this.rankId,1, data => {
@@ -102,9 +117,19 @@ export default {
             this.bookInfo = data.ranking
             this.refreshBookList()
           }
-        })
+        },refresh)
       }
     },
+     onrefresh (event) {
+        this.refreshing = true
+        this.len = 0
+        this.bookList = []
+        this.getBookList(true)
+      },
+    onloading (event) {
+        this.loadinging = true
+        this.loadMoreBook()
+      },
     loadMoreBook() {
       // this.len += 10
       this.refreshBookList()
@@ -116,6 +141,9 @@ export default {
         }
       })
       this.len = this.bookList.length
+
+      this.refreshing = false
+      this.loadinging = false
     },
     lookBookInfo(item){
       this.jump({name:'bookinfo',query:{bookId:item._id}})
@@ -124,8 +152,11 @@ export default {
 }
 </script>
 <style scoped>
+.book-list-page{
+  margin-top:120px;
+}
 .scroller {
-  height: 1194px;
+  height: 1144px;
 }
 .tab-sex {
   flex-direction: row;
@@ -230,6 +261,15 @@ export default {
   height: 80px;
   justify-content: center;
   align-items: center;
+}
+.more-book-text{
+  font-size: 30px;
+}
+
+.indicator-text{
+  text-align: center;
+  font-size: 30px;
+  color: #aaa;
 }
 </style>
 

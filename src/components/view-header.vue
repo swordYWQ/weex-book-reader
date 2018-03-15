@@ -7,15 +7,21 @@
 
 <style scoped>
 .header {
-  position: relative;
+  position: fixed;
+  top:0;
+  left:0;
+  width:750px;
   height: 120px;
   line-height: 120px;
-  margin-bottom: 3px;
+  /* margin-bottom: 3px; */
   border-bottom-width: 2px;
   border-bottom-style: solid;
   border-bottom-color: #dddddd;
   background-color: skyblue; /*#ff6600;*/
-  padding: 25px;
+  padding-top: 25px;
+  padding-right: 25px;
+  padding-bottom: 25px;
+  padding-left: 25px;
   flex-direction: row;
   justify-content: center;
   align-items: center;

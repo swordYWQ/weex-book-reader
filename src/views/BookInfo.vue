@@ -110,6 +110,7 @@ export default {
 <style scoped>
 .scroller {
   height: 1194px;
+  margin-top:120px;
 }
 .book-info {
   flex-direction: row;
@@ -142,15 +143,19 @@ export default {
 }
 .book-author {
   font-size: 30px;
+  color: #aaa;
 }
 .book-count {
   font-size: 30px;
+  color: #aaa;
 }
 .book-updated {
   font-size: 30px;
+  color: #aaa;
 }
 .book-chapter {
   font-size: 30px;
+  color: #aaa;
 }
 .book-long-intro {
   padding-top: 20px;
@@ -161,6 +166,7 @@ export default {
   border-bottom-width: 2px;
   border-bottom-style: solid;
   border-bottom-color: #eee;
+  color: #aaa;
 }
 .book-desc-title {
   font-size: 30px;
@@ -170,6 +176,7 @@ export default {
 }
 .book-long-desc {
   font-size: 30px;
+  color: #aaa;
 }
 
 .book-btn-group {

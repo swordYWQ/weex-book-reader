@@ -36,6 +36,7 @@ export function SET_SETTINGCONFIG(state, { config }) {
 }
 
 export function SET_MARKINFO(state, { markinfo }) {
+  console.log('mutations:markinfo:',markinfo)
   state.markInfo = markinfo
 }
 

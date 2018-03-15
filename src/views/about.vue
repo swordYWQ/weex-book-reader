@@ -12,7 +12,7 @@
           <text class="about-text gray">本项目基于weex+vue进行开发，脚手架基于weex-hacknews，是在weex开发原生项目的一次尝试。</text>
         </div>
         <div class="about-cell">
-          <text class="about-text gray">版本:v1.0</text>
+          <text class="about-text gray">版本:v1.1</text>
         </div>
         <div class="about-cell">
           <text class="about-text gray">作者:weiqiang.yu</text>
