@@ -49,19 +49,20 @@ npm run proxy
 
 ### 运行IOS项目
 
-暂时未对IOS项目进行处理
+暂时未对IOS项目进行调试开发
 
 ### 项目状态
 
 基本完成功能开发，在web端基本访问正常，存在些许bug，在安卓端仍存在很多兼容问题需要修改。
 
-### 坑
+### 遇到过的坑
 1. 同时使用<refresh>和<loading>多试几次会失效(使用list组件的loadmore事件)
 2. refresh在安卓上有时上滑也会触发事件(换成list能正常使用)
 3. weex命令创建的安卓包自带navBar(修改AndroidManifest.xml中application标签属性android:theme="@style/AppTheme.NoActionBar")
 4. weex命令创建的安卓包顶部导航栏为白色(修改values目录下style中对应主题样式，<item name="android:statusBarColor">@android:color/transparent</item>)
 5. 安卓屏幕大小不一致时，使用通用宽高750*1334会出现空白(使用weex.config.env获取设备宽高，通过动态样式计算组件高度，完美解决)
 6. weex native端不支持z-index样式,后渲染的元素层级越高，但元素被v-if重新生成后层级也会更高。
+7. 通过vue-router单页构建的app在切换路由的时候会略有闪屏
 
 ### 更新日志
 
@@ -111,7 +112,5 @@ npm run proxy
 ### 待优化功能
 
 1. web:设置字体功能无效
-2. 公共:增加缓存章节功能
-3. 公共:小说阅读视图添加翻页
-4. 添加组件缓存，不重复加载数据
-6. 添加换源功能
+2. 公共:小说阅读视图添加翻页
+3. 添加换源功能
